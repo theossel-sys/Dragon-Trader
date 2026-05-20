@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Drachenhandel 🐉</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=MedievalSharp&family=Cinzel:wght@400;700;900&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&family=Cinzel:wght@400;700;900&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap');
 
   :root {
     --gold: #f5c842;
@@ -66,14 +66,15 @@
   .header {
     text-align: center;
     padding: 20px 10px 15px;
+    position: relative;
   }
   .header h1 {
-    font-family: 'Cinzel', serif;
-    font-size: clamp(2rem, 6vw, 3.5rem);
-    font-weight: 900;
+    font-family: 'UnifrakturMaguntia', 'Cinzel', serif;
+    font-size: clamp(2.2rem, 7vw, 4rem);
+    font-weight: 400;
     color: var(--gold);
     text-shadow: 0 0 20px rgba(245,200,66,0.5), 2px 2px 0 var(--brown);
-    letter-spacing: 3px;
+    letter-spacing: 2px;
   }
   .header .subtitle {
     font-family: 'Crimson Text', serif;
@@ -82,6 +83,20 @@
     font-size: 1.1rem;
     margin-top: 4px;
   }
+  .music-btn {
+    position: absolute;
+    top: 20px;
+    right: 0;
+    background: linear-gradient(135deg, #2a1800, #1a0e00);
+    border: 2px solid var(--dark-gold);
+    border-radius: 8px;
+    padding: 6px 12px;
+    font-size: 1.2rem;
+    cursor: pointer;
+    color: var(--gold);
+    transition: all 0.2s;
+  }
+  .music-btn:hover { background: linear-gradient(135deg, #3a2800, #2a1800); }
 
   /* Status Bar */
   .status-bar {
@@ -174,6 +189,7 @@
   .city-name { font-weight: 700; font-size: 0.85rem; }
   .city-tag { font-size: 0.65rem; color: var(--parchment-dark); font-family: 'Crimson Text', serif; margin-top: 2px; }
   .travel-cost { font-size: 0.7rem; color: var(--gold); opacity: 0.8; margin-top: 3px; }
+  .city-rep { font-size: 0.6rem; color: #f5c842; margin-top: 2px; }
 
   /* Market */
   .goods-grid {
@@ -198,7 +214,7 @@
   .good-icon { font-size: 1.6rem; }
   .good-name { font-family: 'Cinzel', serif; font-size: 0.8rem; font-weight: 700; color: var(--brown); }
   .good-price {
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     color: var(--dark-gold);
     font-weight: 600;
   }
@@ -249,7 +265,7 @@
 
   /* Log */
   .log {
-    max-height: 100px;
+    max-height: 120px;
     overflow-y: auto;
     font-size: 0.8rem;
     color: var(--brown);
@@ -293,6 +309,36 @@
     box-shadow: 0 0 4px rgba(245,200,66,0.5);
   }
   .turn-dot.used { background: #444; box-shadow: none; }
+
+  /* Event flash banner */
+  .event-banner {
+    display: none;
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: linear-gradient(135deg, #2a1800ee, #1a0e00ee);
+    border: 2px solid var(--dark-gold);
+    border-radius: 12px;
+    padding: 14px 28px;
+    font-family: 'Cinzel', serif;
+    color: var(--gold);
+    font-size: 1rem;
+    z-index: 200;
+    box-shadow: 0 6px 24px rgba(0,0,0,0.7);
+    text-align: center;
+    max-width: 340px;
+    width: 90%;
+    animation: slideDown 0.3s ease;
+  }
+  .event-banner.show { display: block; }
+  @keyframes slideDown {
+    from { transform: translateX(-50%) translateY(-20px); opacity: 0; }
+    to   { transform: translateX(-50%) translateY(0);    opacity: 1; }
+  }
+  .ev-icon { font-size: 2rem; display: block; margin-bottom: 4px; }
+  .ev-title { font-weight: 700; font-size: 1rem; margin-bottom: 4px; }
+  .ev-desc { font-family: 'Crimson Text', serif; font-size: 0.9rem; color: var(--parchment); }
 
   /* Win/Lose overlay */
   .overlay {
@@ -423,7 +469,6 @@
   .hs-table tr.hs-top td { font-weight: 700; color: var(--brown); }
   .hs-table tr.hs-top:first-child td { color: #8b4500; }
   .hs-rank { font-family: 'Cinzel', serif; font-weight: 700; width: 30px; }
-  .hs-medal { font-size: 1.1rem; }
   .hs-gold-val { font-family: 'Cinzel', serif; font-weight: 700; color: var(--dark-gold); }
   .hs-empty { text-align: center; font-style: italic; color: var(--brown-light); padding: 16px; }
   .hs-new { background: rgba(245,200,66,0.2); animation: hs-flash 1s ease; }
@@ -449,13 +494,12 @@
 <body>
 <div id="app">
   <div class="header">
+    <button class="music-btn" id="musicBtn" onclick="toggleMusic()" title="Musik an">🔇</button>
     <h1>🐉 Drachenhandel</h1>
     <div class="subtitle">Reise durch die magischen Lande — kaufe günstig, verkaufe teuer!</div>
   </div>
 
-  <div class="status-bar" id="statusBar">
-    <!-- rendered by JS -->
-  </div>
+  <div class="status-bar" id="statusBar"></div>
 
   <div class="panel">
     <div class="panel-title">🗺️ Karte der Zauberlande <span style="font-size:0.8rem; font-weight:400; color:var(--brown-light); margin-left:auto;">Runden übrig:</span></div>
@@ -489,13 +533,20 @@
   </div>
 </div>
 
+<!-- Event flash banner -->
+<div class="event-banner" id="eventBanner">
+  <span class="ev-icon" id="evIcon"></span>
+  <div class="ev-title" id="evTitle"></div>
+  <div class="ev-desc" id="evDesc"></div>
+</div>
+
 <!-- Win/Lose overlay -->
 <div class="overlay" id="overlay">
   <div class="overlay-box">
     <div class="overlay-icon" id="overlayIcon"></div>
     <div class="overlay-title" id="overlayTitle"></div>
     <div class="overlay-msg" id="overlayMsg"></div>
-    <div class="name-input-wrap" id="nameInputWrap">
+    <div class="name-input-wrap">
       <input class="name-input" id="playerNameInput" type="text" maxlength="20" placeholder="Dein Name..." />
       <button class="btn-save-score" id="btnSaveScore" onclick="saveScore()">💾 Eintragen</button>
     </div>
@@ -506,23 +557,88 @@
 <script>
 // ---- GAME DATA ----
 const CITIES = [
-  { id: 'drachenfels', name: 'Drachenfels', icon: '🏔️', tag: 'Drachenhort', special: 'drachenstaub', travelCost: 0 },
-  { id: 'elfenwald',   name: 'Elfenwald',   icon: '🌲', tag: 'Elfensiedlung', special: 'elfenpulver', travelCost: 10 },
+  { id: 'drachenfels', name: 'Drachenfels', icon: '🏔️', tag: 'Drachenhort',   special: 'drachenstaub',   travelCost: 0  },
+  { id: 'elfenwald',   name: 'Elfenwald',   icon: '🌲', tag: 'Elfensiedlung', special: 'elfenpulver',    travelCost: 10 },
   { id: 'kristallsee', name: 'Kristallsee', icon: '💧', tag: 'Wasserreich',   special: 'zauberkristall', travelCost: 15 },
-  { id: 'feuerberg',   name: 'Feuerberg',   icon: '🌋', tag: 'Zwergenstadt',  special: 'feuergold', travelCost: 20 },
-  { id: 'mondturm',    name: 'Mondturm',    icon: '🌙', tag: 'Zauberburg',    special: 'mondstein', travelCost: 25 },
-  { id: 'sturmklippe', name: 'Sturmklippe', icon: '⚡', tag: 'Hexendorf',     special: 'blitzkraut', travelCost: 30 },
+  { id: 'feuerberg',   name: 'Feuerberg',   icon: '🌋', tag: 'Zwergenstadt',  special: 'feuergold',      travelCost: 20 },
+  { id: 'mondturm',    name: 'Mondturm',    icon: '🌙', tag: 'Zauberburg',    special: 'mondstein',      travelCost: 25 },
+  { id: 'sturmklippe', name: 'Sturmklippe', icon: '⚡', tag: 'Hexendorf',     special: 'blitzkraut',     travelCost: 30 },
 ];
 
 const GOODS = [
-  { id: 'drachenstaub',   name: 'Drachenstaub',   icon: '✨', basePrice: 30, desc: 'Funkelnder Staub von Drachen' },
-  { id: 'elfenpulver',    name: 'Elfenpulver',     icon: '🌟', basePrice: 40, desc: 'Glitzerndes Elfenstaub' },
-  { id: 'zauberkristall', name: 'Zauberkristall',  icon: '💎', basePrice: 55, desc: 'Leuchtender Kristall' },
-  { id: 'feuergold',      name: 'Feuergold',       icon: '🔥', basePrice: 70, desc: 'Gold aus dem Vulkan' },
-  { id: 'mondstein',      name: 'Mondstein',       icon: '🌕', basePrice: 60, desc: 'Magischer Mondstein' },
-  { id: 'blitzkraut',     name: 'Blitzkraut',      icon: '⚡', basePrice: 35, desc: 'Elektrisches Zauberkraut' },
-  { id: 'heiltrank',      name: 'Heiltrank',       icon: '🧪', basePrice: 45, desc: 'Heilende Zaubertrank' },
-  { id: 'drachenschuppe', name: 'Drachenschuppe',  icon: '🛡️', basePrice: 80, desc: 'Seltene Drachenschuppe' },
+  { id: 'drachenstaub',   name: 'Drachenstaub',   icon: '✨', basePrice: 30 },
+  { id: 'elfenpulver',    name: 'Elfenpulver',     icon: '🌟', basePrice: 40 },
+  { id: 'zauberkristall', name: 'Zauberkristall',  icon: '💎', basePrice: 55 },
+  { id: 'feuergold',      name: 'Feuergold',       icon: '🔥', basePrice: 70 },
+  { id: 'mondstein',      name: 'Mondstein',       icon: '🌕', basePrice: 60 },
+  { id: 'blitzkraut',     name: 'Blitzkraut',      icon: '⚡', basePrice: 35 },
+  { id: 'heiltrank',      name: 'Heiltrank',       icon: '🧪', basePrice: 45 },
+  { id: 'drachenschuppe', name: 'Drachenschuppe',  icon: '🛡️', basePrice: 80 },
+];
+
+// Random travel events (30% chance per journey)
+const EVENTS = [
+  {
+    id: 'banditen', icon: '⚔️', title: 'Räuberüberfall!', prob: 0.20,
+    apply(s) {
+      if (s.bag.length > 0 && Math.random() < 0.45) {
+        const stolen = s.bag.splice(Math.floor(Math.random() * s.bag.length), 1)[0];
+        return { msg: `⚔️ Räuber stehlen dir ${stolen.icon} ${stolen.name}!`, type: 'bad', desc: `${stolen.icon} ${stolen.name} gestohlen!` };
+      }
+      const loss = Math.min(s.gold, 10 + Math.floor(Math.random() * 25));
+      s.gold -= loss;
+      return { msg: `⚔️ Räuber überfallen dich! ${loss} 🪙 geraubt!`, type: 'bad', desc: `${loss} 🪙 geraubt!` };
+    }
+  },
+  {
+    id: 'gluecksfund', icon: '✨', title: 'Glücksfund!', prob: 0.16,
+    apply(s) {
+      if (!bagFull() && Math.random() < 0.5) {
+        const good = GOODS[Math.floor(Math.random() * GOODS.length)];
+        s.bag.push({ id: good.id, name: good.name, icon: good.icon, buyPrice: 0 });
+        return { msg: `✨ Du findest ${good.icon} ${good.name} am Wegesrand!`, type: 'good', desc: `${good.icon} ${good.name} gefunden!` };
+      }
+      const bonus = 15 + Math.floor(Math.random() * 25);
+      s.gold += bonus;
+      return { msg: `✨ Versteckter Geldbeutel — ${bonus} 🪙!`, type: 'good', desc: `${bonus} 🪙 gefunden!` };
+    }
+  },
+  {
+    id: 'wanderhaendler', icon: '🧙', title: 'Wanderhändler!', prob: 0.12,
+    apply(s) {
+      const bonus = 20 + Math.floor(Math.random() * 30);
+      s.gold += bonus;
+      return { msg: `🧙 Ein Wanderhändler zahlt dir ${bonus} 🪙 für alte Waren!`, type: 'good', desc: `${bonus} 🪙 extra!` };
+    }
+  },
+  {
+    id: 'sturm', icon: '🌩️', title: 'Gewitter!', prob: 0.10,
+    apply(s) {
+      if (s.turnsLeft <= 2) return null;
+      s.turnsLeft--;
+      return { msg: `🌩️ Ein Sturm verzögert die Reise — eine Runde verloren!`, type: 'bad', desc: '−1 Runde' };
+    }
+  },
+  {
+    id: 'stadtfest', icon: '🎉', title: 'Stadtfest!', prob: 0.12,
+    apply(s) {
+      const bonus = 15 + Math.floor(Math.random() * 20);
+      s.gold += bonus;
+      return { msg: `🎉 Ein Stadtfest! Großzügige Händler geben dir ${bonus} 🪙!`, type: 'good', desc: `${bonus} 🪙 Festbonus!` };
+    }
+  },
+  {
+    id: 'drache', icon: '🐉', title: 'Drachenbegegnung!', prob: 0.07,
+    apply(s) {
+      if (!bagFull()) {
+        const g = GOODS.find(x => x.id === 'drachenstaub');
+        s.bag.push({ id: g.id, name: g.name, icon: g.icon, buyPrice: 0 });
+        return { msg: `🐉 Ein Drache hinterlässt ✨ Drachenstaub für dich!`, type: 'good', desc: '✨ Drachenstaub erhalten!' };
+      }
+      s.gold += 30;
+      return { msg: `🐉 Ein beeindruckter Drache belohnt dich mit 30 🪙!`, type: 'good', desc: '30 🪙 Drachenbonus!' };
+    }
+  },
 ];
 
 const BAG_SIZE = 6;
@@ -530,47 +646,77 @@ const START_GOLD = 200;
 const TOTAL_TURNS = 12;
 const WIN_GOLD = 500;
 
-// ---- GAME STATE ----
+// ---- STATE ----
 let state = {};
+let bannerTimer = null;
 
 function initGame() {
   document.getElementById('overlay').classList.remove('show');
-  // generate prices per city
   const cityPrices = {};
+  const cityRep = {};
   CITIES.forEach(city => {
     cityPrices[city.id] = {};
+    cityRep[city.id] = 0;
     GOODS.forEach(good => {
-      // cities specialising in a good sell it cheap, buy it pricier elsewhere
       const isSpecial = city.special === good.id;
-      const factor = isSpecial
-        ? 0.55 + Math.random() * 0.2      // 55–75% of base (cheap here)
-        : 1.0  + Math.random() * 0.6;     // 100–160% of base (expensive)
-      cityPrices[city.id][good.id] = Math.round(good.basePrice * factor);
+      const f = isSpecial ? 0.55 + Math.random() * 0.2 : 1.0 + Math.random() * 0.6;
+      cityPrices[city.id][good.id] = Math.round(good.basePrice * f);
     });
   });
-
   state = {
     gold: START_GOLD,
     turnsLeft: TOTAL_TURNS,
     currentCity: 'drachenfels',
-    bag: [],          // [{id, name, icon, buyPrice}]
+    bag: [],
     cityPrices,
-    log: ['🐉 Willkommen, tapferer Händler! Reise durch die Zauberlande und mache Gewinn!'],
+    cityRep,
+    log: [
+      { msg: '🐉 Willkommen, tapferer Händler! Reise durch die Zauberlande und mache Gewinn!', type: '' },
+      { msg: '💡 Tipp: Spezialware (⭐) ist in ihrer Heimatstadt günstig — anderswo teuer!', type: '' },
+      { msg: '🤝 Tipp: Besuche Städte mehrfach — dein Ruf wächst und die Preise verbessern sich!', type: '' },
+    ],
   };
   render();
 }
 
 // ---- HELPERS ----
-function getPrice(cityId, goodId) {
-  return state.cityPrices[cityId][goodId];
-}
-
 function bagCount() { return state.bag.length; }
 function bagFull()  { return state.bag.length >= BAG_SIZE; }
 
-function addLog(msg, type='') {
+// Reputation discount: each ⭐ = 3% better price
+function getBuyPrice(cityId, goodId) {
+  const base = state.cityPrices[cityId][goodId];
+  const rep  = state.cityRep[cityId] || 0;
+  return Math.max(5, Math.round(base * (1 - rep * 0.03)));
+}
+function getSellPrice(cityId, goodId) {
+  const base = state.cityPrices[cityId][goodId];
+  const rep  = state.cityRep[cityId] || 0;
+  return Math.round(base * (1 + rep * 0.03));
+}
+
+function addLog(msg, type = '') {
   state.log.unshift({ msg, type });
-  if (state.log.length > 30) state.log.pop();
+  if (state.log.length > 40) state.log.pop();
+}
+
+function showBanner(icon, title, desc) {
+  document.getElementById('evIcon').textContent  = icon;
+  document.getElementById('evTitle').textContent = title;
+  document.getElementById('evDesc').textContent  = desc;
+  const b = document.getElementById('eventBanner');
+  b.classList.add('show');
+  if (bannerTimer) clearTimeout(bannerTimer);
+  bannerTimer = setTimeout(() => b.classList.remove('show'), 2800);
+}
+
+function triggerEvent() {
+  for (const evt of EVENTS) {
+    if (Math.random() < evt.prob) {
+      const r = evt.apply(state);
+      if (r) { addLog(r.msg, r.type); showBanner(evt.icon, evt.title, r.desc); return; }
+    }
+  }
 }
 
 function travel(cityId) {
@@ -578,27 +724,37 @@ function travel(cityId) {
   if (!city || cityId === state.currentCity) return;
   if (city.travelCost > state.gold) {
     addLog(`⚠️ Nicht genug Gold für die Reise nach ${city.name}!`, 'bad');
-    render();
-    return;
+    render(); return;
   }
   state.gold -= city.travelCost;
   state.currentCity = cityId;
   state.turnsLeft--;
-  // Randomize prices slightly each visit
+
+  // Gain reputation in destination (max 5)
+  if (state.cityRep[cityId] < 5) state.cityRep[cityId]++;
+
+  // Slight price fluctuation on visit
   GOODS.forEach(good => {
     const cur = state.cityPrices[cityId][good.id];
-    const delta = Math.floor((Math.random() - 0.5) * 10);
-    state.cityPrices[cityId][good.id] = Math.max(5, cur + delta);
+    state.cityPrices[cityId][good.id] = Math.max(5, cur + Math.floor((Math.random() - 0.5) * 12));
   });
+
   if (city.travelCost > 0) addLog(`🗺️ Reise nach ${city.name} kostet ${city.travelCost} 🪙`, 'bad');
   else addLog(`🏠 Du bist in ${city.name}.`);
+
+  const rep = state.cityRep[cityId];
+  if (rep > 0) addLog(`🤝 Ruf in ${city.name}: ${'⭐'.repeat(rep)} (${rep * 3}% bessere Preise)`, 'good');
+
+  // 30% chance of random event on any journey
+  if (Math.random() < 0.30) triggerEvent();
+
   checkEnd();
   render();
 }
 
 function buy(goodId) {
   if (bagFull()) { addLog('🎒 Dein Rucksack ist voll!', 'bad'); render(); return; }
-  const price = getPrice(state.currentCity, goodId);
+  const price = getBuyPrice(state.currentCity, goodId);
   if (price > state.gold) { addLog('💸 Nicht genug Gold!', 'bad'); render(); return; }
   const good = GOODS.find(g => g.id === goodId);
   state.gold -= price;
@@ -610,247 +766,251 @@ function buy(goodId) {
 function sell(goodId) {
   const idx = state.bag.findIndex(b => b.id === goodId);
   if (idx === -1) return;
-  const item = state.bag[idx];
-  const price = getPrice(state.currentCity, goodId);
-  state.bag.splice(idx, 1);
+  const item = state.bag.splice(idx, 1)[0];
+  const price = getSellPrice(state.currentCity, goodId);
   const profit = price - item.buyPrice;
   state.gold += price;
-  if (profit > 0) addLog(`💰 ${item.icon} ${item.name} für ${price} 🪙 verkauft (+${profit} Gewinn!)`, 'good');
-  else if (profit === 0) addLog(`➡️ ${item.icon} ${item.name} für ${price} 🪙 verkauft (kein Gewinn)`, '');
-  else addLog(`📉 ${item.icon} ${item.name} für ${price} 🪙 verkauft (${profit} Verlust)`, 'bad');
+  if (profit > 0)      addLog(`💰 ${item.icon} ${item.name} für ${price} 🪙 (+${profit} Gewinn!)`, 'good');
+  else if (profit < 0) addLog(`📉 ${item.icon} ${item.name} für ${price} 🪙 (${profit} Verlust)`, 'bad');
+  else                 addLog(`➡️ ${item.icon} ${item.name} für ${price} 🪙 (kein Gewinn)`, '');
   render();
 }
 
 function checkEnd() {
-  if (state.turnsLeft <= 0) {
-    setTimeout(() => showEnd(), 300);
-  }
+  if (state.turnsLeft <= 0) setTimeout(showEnd, 300);
 }
 
 // ---- HIGHSCORE ----
 const HS_KEY = 'drachenhandel_hs';
-const MAX_HS = 10;
 
 function loadHighscores() {
-  try { return JSON.parse(localStorage.getItem(HS_KEY) || '[]'); } catch(e) { return []; }
-}
-function saveHighscores(list) {
-  localStorage.setItem(HS_KEY, JSON.stringify(list));
+  try { return JSON.parse(localStorage.getItem(HS_KEY) || '[]'); } catch { return []; }
 }
 function clearHighscores() {
-  if (confirm('Wirklich alle Einträge löschen?')) {
-    localStorage.removeItem(HS_KEY);
-    renderHighscores();
-  }
+  if (confirm('Wirklich alle Einträge löschen?')) { localStorage.removeItem(HS_KEY); renderHighscores(); }
 }
 function saveScore() {
   const nameEl = document.getElementById('playerNameInput');
   const name = nameEl.value.trim() || 'Unbekannter Held';
   const list = loadHighscores();
-  const date = new Date().toLocaleDateString('de-DE');
-  list.push({ name, gold: state._finalGold, won: state._won, date });
+  list.push({ name, gold: state._finalGold, won: state._won, date: new Date().toLocaleDateString('de-DE') });
   list.sort((a, b) => b.gold - a.gold);
-  if (list.length > MAX_HS) list.length = MAX_HS;
-  saveHighscores(list);
-  // Disable save button
+  list.length = Math.min(list.length, 10);
+  localStorage.setItem(HS_KEY, JSON.stringify(list));
   document.getElementById('btnSaveScore').disabled = true;
   document.getElementById('btnSaveScore').textContent = '✅ Gespeichert!';
   nameEl.disabled = true;
   renderHighscores(name);
 }
 
-function renderHighscores(highlightName) {
+function renderHighscores(highlight) {
   const list = loadHighscores();
   const el = document.getElementById('highscoreList');
-  if (!list.length) {
-    el.innerHTML = '<div class="hs-empty">Noch keine Einträge — spiel und trag dich ein! 🐉</div>';
-    return;
-  }
+  if (!list.length) { el.innerHTML = '<div class="hs-empty">Noch keine Einträge — spiel und trag dich ein! 🐉</div>'; return; }
   const medals = ['🥇','🥈','🥉'];
   const rows = list.map((e, i) => {
-    const isNew = highlightName && e.name === highlightName && i === list.findIndex(x => x.name === highlightName && x.gold === e.gold);
+    const isNew = highlight && e.name === highlight && i === list.findIndex(x => x.name === highlight && x.gold === e.gold);
     return `<tr class="${i < 3 ? 'hs-top' : ''} ${isNew ? 'hs-new' : ''}">
-      <td class="hs-rank">${medals[i] || (i+1)+'.'}</td>
-      <td>${e.name}</td>
-      <td class="hs-gold-val">${e.gold} 🪙</td>
-      <td>${e.won ? '🏆' : '😔'}</td>
-      <td style="font-size:0.72rem; color:var(--brown-light);">${e.date}</td>
-    </tr>`;
+      <td class="hs-rank">${medals[i] || (i+1)+'.'}</td><td>${e.name}</td>
+      <td class="hs-gold-val">${e.gold} 🪙</td><td>${e.won ? '🏆' : '😔'}</td>
+      <td style="font-size:0.72rem;color:var(--brown-light)">${e.date}</td></tr>`;
   }).join('');
-  el.innerHTML = `<table class="hs-table">
-    <thead><tr>
-      <th>#</th><th>Name</th><th>Gold</th><th>Ergebnis</th><th>Datum</th>
-    </tr></thead>
-    <tbody>${rows}</tbody>
-  </table>`;
+  el.innerHTML = `<table class="hs-table"><thead><tr><th>#</th><th>Name</th><th>Gold</th><th>Ergebnis</th><th>Datum</th></tr></thead><tbody>${rows}</tbody></table>`;
 }
 
 function showEnd() {
-  const overlay = document.getElementById('overlay');
-  const icon = document.getElementById('overlayIcon');
-  const title = document.getElementById('overlayTitle');
-  const msg = document.getElementById('overlayMsg');
-
-  // Sell all remaining items at current city
   let finalGold = state.gold;
-  state.bag.forEach(item => {
-    finalGold += getPrice(state.currentCity, item.id);
-  });
+  state.bag.forEach(item => { finalGold += getSellPrice(state.currentCity, item.id); });
   state._finalGold = finalGold;
+  state._won = finalGold >= WIN_GOLD;
 
-  const won = finalGold >= WIN_GOLD;
-  state._won = won;
+  document.getElementById('playerNameInput').value = '';
+  document.getElementById('playerNameInput').disabled = false;
+  document.getElementById('btnSaveScore').disabled = false;
+  document.getElementById('btnSaveScore').textContent = '💾 Eintragen';
 
-  // Reset name input
-  const nameEl = document.getElementById('playerNameInput');
-  nameEl.value = '';
-  nameEl.disabled = false;
-  const saveBtn = document.getElementById('btnSaveScore');
-  saveBtn.disabled = false;
-  saveBtn.textContent = '💾 Eintragen';
-
-  overlay.classList.add('show');
-
-  if (won) {
-    icon.textContent = '🏆';
-    title.textContent = 'Gewonnen!';
-    msg.innerHTML = `Du hast <strong>${finalGold} 🪙</strong> verdient!<br><br>Der König ernennt dich zum <em>Meister-Drachenhändler</em>! 🐉<br><span style="font-size:0.85rem; color:var(--brown-light);">Trag deinen Namen ein!</span>`;
-  } else {
-    icon.textContent = '😔';
-    title.textContent = 'Schade!';
-    msg.innerHTML = `Du hast <strong>${finalGold} 🪙</strong> verdient.<br>Ziel war: ${WIN_GOLD} 🪙<br><br><span style="font-size:0.85rem; color:var(--brown-light);">Trag deinen Score ein und versuche es nochmal!</span>`;
-  }
+  document.getElementById('overlayIcon').textContent  = state._won ? '🏆' : '😔';
+  document.getElementById('overlayTitle').textContent = state._won ? 'Gewonnen!' : 'Schade!';
+  document.getElementById('overlayMsg').innerHTML     = state._won
+    ? `Du hast <strong>${finalGold} 🪙</strong> verdient!<br><br>Der König ernennt dich zum <em>Meister-Drachenhändler</em>! 🐉`
+    : `Du hast <strong>${finalGold} 🪙</strong> verdient.<br>Ziel war: ${WIN_GOLD} 🪙 — knapp daneben!<br><br>Nächstes Mal schaffst du es! 💪`;
+  document.getElementById('overlay').classList.add('show');
 }
 
 // ---- RENDER ----
 function render() {
-  renderStatus();
-  renderTurns();
-  renderCityMap();
-  renderMarket();
-  renderInventory();
-  renderLog();
-  renderHighscores();
-}
-
-function renderStatus() {
+  // Status bar
   document.getElementById('statusBar').innerHTML = `
     <div class="stat-badge"><span class="icon">🪙</span><span>Gold:</span><span class="value">${state.gold}</span></div>
     <div class="stat-badge"><span class="icon">🎒</span><span>Rucksack:</span><span class="value">${bagCount()}/${BAG_SIZE}</span></div>
     <div class="stat-badge"><span class="icon">⏳</span><span>Runden:</span><span class="value">${state.turnsLeft}</span></div>
-    <div class="stat-badge"><span class="icon">🏆</span><span>Ziel:</span><span class="value">${WIN_GOLD} 🪙</span></div>
-  `;
-}
+    <div class="stat-badge"><span class="icon">🏆</span><span>Ziel:</span><span class="value">${WIN_GOLD} 🪙</span></div>`;
 
-function renderTurns() {
+  // Turn dots
   const used = TOTAL_TURNS - state.turnsLeft;
-  let html = '';
-  for (let i = 0; i < TOTAL_TURNS; i++) {
-    html += `<div class="turn-dot ${i < used ? 'used' : ''}"></div>`;
-  }
-  document.getElementById('turnsLeft').innerHTML = html;
-}
+  document.getElementById('turnsLeft').innerHTML =
+    Array.from({length: TOTAL_TURNS}, (_, i) => `<div class="turn-dot ${i < used ? 'used' : ''}"></div>`).join('');
 
-function renderCityMap() {
-  const cur = CITIES.find(c => c.id === state.currentCity);
+  // City map
   document.getElementById('cityMap').innerHTML = CITIES.map(city => {
     const isCurrent = city.id === state.currentCity;
     const canAfford = city.travelCost <= state.gold;
-    const costLabel = city.travelCost === 0 ? 'Start-Stadt' : `Reise: ${city.travelCost} 🪙`;
-    return `
-      <button
-        class="city-btn ${isCurrent ? 'current' : ''} tooltip"
-        data-tip="${isCurrent ? 'Du bist hier!' : (canAfford ? 'Reise hierher' : 'Zu weit weg!')}"
-        onclick="travel('${city.id}')"
-        ${isCurrent || !canAfford ? 'disabled' : ''}
-      >
-        <span class="city-icon">${city.icon}</span>
-        <span class="city-name">${city.name}</span>
-        <span class="city-tag">${city.tag}</span>
-        ${!isCurrent ? `<span class="travel-cost">${costLabel}</span>` : '<span class="travel-cost">📍 Hier</span>'}
-      </button>
-    `;
+    const rep = state.cityRep[city.id] || 0;
+    return `<button class="city-btn ${isCurrent ? 'current' : ''} tooltip"
+        data-tip="${isCurrent ? 'Du bist hier!' : canAfford ? 'Reise hierher' : 'Zu teuer!'}"
+        onclick="travel('${city.id}')" ${isCurrent || !canAfford ? 'disabled' : ''}>
+      <span class="city-icon">${city.icon}</span>
+      <span class="city-name">${city.name}</span>
+      <span class="city-tag">${city.tag}</span>
+      <span class="travel-cost">${isCurrent ? '📍 Hier' : (city.travelCost === 0 ? 'Start' : `${city.travelCost} 🪙`)}</span>
+      ${rep > 0 ? `<span class="city-rep">${'⭐'.repeat(rep)}</span>` : ''}
+    </button>`;
   }).join('');
-}
 
-function renderMarket() {
+  // Market
   const city = CITIES.find(c => c.id === state.currentCity);
   document.getElementById('marketTitle').innerHTML = `🏪 Markt in ${city.icon} ${city.name}`;
   const inBag = {};
   state.bag.forEach(b => { inBag[b.id] = (inBag[b.id] || 0) + 1; });
-
   document.getElementById('marketGoods').innerHTML = GOODS.map(good => {
-    const price = getPrice(state.currentCity, good.id);
+    const bp = getBuyPrice(state.currentCity, good.id);
+    const sp = getSellPrice(state.currentCity, good.id);
     const owned = inBag[good.id] || 0;
     const isSpecial = city.special === good.id;
-    const priceColor = isSpecial ? 'color: var(--green); font-weight:700;' : '';
-    return `
-      <div class="good-card">
-        <div class="good-header">
-          <span class="good-icon">${good.icon}</span>
-          <div>
-            <div class="good-name">${good.name}${isSpecial ? ' ⭐' : ''}</div>
-            <div class="good-price" style="${priceColor}">${price} 🪙</div>
-          </div>
+    return `<div class="good-card">
+      <div class="good-header">
+        <span class="good-icon">${good.icon}</span>
+        <div>
+          <div class="good-name">${good.name}${isSpecial ? ' ⭐' : ''}</div>
+          <div class="good-price" ${isSpecial ? 'style="color:var(--green);font-weight:700"' : ''}>Kauf: ${bp} 🪙 &nbsp; Verk: ${sp} 🪙</div>
         </div>
-        <div class="good-actions">
-          <button class="btn-trade btn-buy" onclick="buy('${good.id}')"
-            ${bagFull() || price > state.gold ? 'disabled' : ''}>
-            Kaufen
-          </button>
-          <button class="btn-trade btn-sell" onclick="sell('${good.id}')"
-            ${owned === 0 ? 'disabled' : ''}>
-            Verkaufen
-          </button>
-        </div>
-        ${owned > 0 ? `<div class="in-bag">Im Rucksack: ${owned}x</div>` : ''}
       </div>
-    `;
+      <div class="good-actions">
+        <button class="btn-trade btn-buy" onclick="buy('${good.id}')" ${bagFull() || bp > state.gold ? 'disabled' : ''}>Kaufen</button>
+        <button class="btn-trade btn-sell" onclick="sell('${good.id}')" ${owned === 0 ? 'disabled' : ''}>Verkaufen</button>
+      </div>
+      ${owned > 0 ? `<div class="in-bag">Im Rucksack: ${owned}x</div>` : ''}
+    </div>`;
   }).join('');
-}
 
-function renderInventory() {
-  const fill = document.getElementById('bagFill');
+  // Inventory
   const pct = (bagCount() / BAG_SIZE) * 100;
+  const fill = document.getElementById('bagFill');
   fill.style.width = pct + '%';
   fill.className = 'bag-fill' + (bagFull() ? ' full' : '');
   document.getElementById('bagCount').textContent = `${bagCount()} / ${BAG_SIZE} Plätze`;
 
   if (bagCount() === 0) {
     document.getElementById('inventory').innerHTML = '<div class="inv-empty">Noch nichts gekauft...</div>';
-    return;
-  }
-
-  // group by id
-  const grouped = {};
-  state.bag.forEach(item => {
-    if (!grouped[item.id]) grouped[item.id] = { ...item, count: 0, totalBuy: 0 };
-    grouped[item.id].count++;
-    grouped[item.id].totalBuy += item.buyPrice;
-  });
-
-  document.getElementById('inventory').innerHTML = Object.values(grouped).map(g => {
-    const curPrice = getPrice(state.currentCity, g.id);
-    const avgBuy = Math.round(g.totalBuy / g.count);
-    const diff = curPrice - avgBuy;
-    const diffStr = diff >= 0 ? `+${diff}` : `${diff}`;
-    const diffColor = diff > 0 ? 'var(--green)' : diff < 0 ? 'var(--red)' : 'inherit';
-    return `
-      <div class="inv-item">
+  } else {
+    const grouped = {};
+    state.bag.forEach(item => {
+      if (!grouped[item.id]) grouped[item.id] = { ...item, count: 0, totalBuy: 0 };
+      grouped[item.id].count++;
+      grouped[item.id].totalBuy += item.buyPrice;
+    });
+    document.getElementById('inventory').innerHTML = Object.values(grouped).map(g => {
+      const sp = getSellPrice(state.currentCity, g.id);
+      const avg = g.count > 0 ? Math.round(g.totalBuy / g.count) : 0;
+      const diff = sp - avg;
+      const col = diff > 0 ? 'var(--green)' : diff < 0 ? 'var(--red)' : 'inherit';
+      return `<div class="inv-item">
         <div class="inv-icon">${g.icon}</div>
         <div>${g.name}</div>
-        <div style="font-weight:600;">${g.count}x</div>
-        <div style="font-size:0.65rem; color:${diffColor};">${diffStr} 🪙</div>
-      </div>
-    `;
-  }).join('');
+        <div style="font-weight:600">${g.count}x</div>
+        <div style="font-size:.65rem;color:${col}">${diff >= 0 ? '+' : ''}${diff} 🪙</div>
+      </div>`;
+    }).join('');
+  }
+
+  // Log
+  document.getElementById('log').innerHTML = state.log
+    .map(e => `<div class="log-entry ${typeof e === 'object' ? e.type : ''}">${typeof e === 'object' ? e.msg : e}</div>`)
+    .join('');
+
+  renderHighscores();
 }
 
-function renderLog() {
-  document.getElementById('log').innerHTML = state.log.map(entry => {
-    if (typeof entry === 'string') return `<div class="log-entry">${entry}</div>`;
-    return `<div class="log-entry ${entry.type || ''}">${entry.msg}</div>`;
-  }).join('');
+// ---- MUSIC (Web Audio API — pentatonic medieval arpeggio) ----
+let audioCtx = null;
+let musicPlaying = false;
+let musicTimer = null;
+let masterGain, delayIn;
+
+// D minor pentatonic: D3 F3 G3 A3 C4 D4 F4 A4
+const SCALE = [146.83, 174.61, 196.00, 220.00, 261.63, 293.66, 349.23, 440.00];
+const PATTERNS = [
+  [4,2,3,5,4,3,2,0],   // descending feel
+  [0,2,4,5,3,4,2,1],   // ascending feel
+  [4,5,3,2,4,2,0,1],   // mixed
+];
+const BEAT = 0.46; // seconds per note
+
+function setupAudio() {
+  if (audioCtx) return;
+  audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+  masterGain = audioCtx.createGain();
+  masterGain.gain.value = 0.32;
+  masterGain.connect(audioCtx.destination);
+
+  // Short echo
+  const delay = audioCtx.createDelay(0.6);
+  delay.delayTime.value = 0.24;
+  const fb = audioCtx.createGain(); fb.gain.value = 0.25;
+  const dOut = audioCtx.createGain(); dOut.gain.value = 0.28;
+  delay.connect(fb); fb.connect(delay);
+  delay.connect(dOut); dOut.connect(masterGain);
+  delayIn = delay;
+}
+
+function playTone(freq, t, dur, vol, type = 'triangle') {
+  const osc = audioCtx.createOscillator();
+  const g   = audioCtx.createGain();
+  osc.type = type; osc.frequency.value = freq;
+  g.gain.setValueAtTime(0.001, t);
+  g.gain.linearRampToValueAtTime(vol, t + 0.04);
+  g.gain.setValueAtTime(vol * 0.65, t + dur * 0.55);
+  g.gain.exponentialRampToValueAtTime(0.001, t + dur);
+  osc.connect(g); g.connect(masterGain); g.connect(delayIn);
+  osc.start(t); osc.stop(t + dur + 0.04);
+}
+
+function scheduleMusic() {
+  if (!musicPlaying) return;
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+
+  const now = audioCtx.currentTime;
+  const pat = PATTERNS[Math.floor(Math.random() * PATTERNS.length)];
+
+  pat.forEach((idx, i) => {
+    playTone(SCALE[idx],       now + i * BEAT, BEAT * 1.25, 0.07);
+    // Occasional octave-up harmony on beat 1 and 5
+    if ((i === 0 || i === 4) && idx + 1 < SCALE.length)
+      playTone(SCALE[idx + 1], now + i * BEAT, BEAT * 0.9, 0.025);
+  });
+
+  // Bass drone every 2 beats
+  for (let i = 0; i < 4; i++)
+    playTone(73.42, now + i * BEAT * 2, BEAT * 1.7, 0.045, 'sine');
+
+  musicTimer = setTimeout(scheduleMusic, (pat.length * BEAT - 0.06) * 1000);
+}
+
+function toggleMusic() {
+  setupAudio();
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+  musicPlaying = !musicPlaying;
+  const btn = document.getElementById('musicBtn');
+  if (musicPlaying) {
+    scheduleMusic();
+    btn.textContent = '🎵';
+    btn.title = 'Musik aus';
+  } else {
+    clearTimeout(musicTimer);
+    btn.textContent = '🔇';
+    btn.title = 'Musik an';
+  }
 }
 
 // Start!
