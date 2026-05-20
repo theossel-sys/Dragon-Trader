@@ -489,6 +489,22 @@
     transition: all 0.15s;
   }
   .btn-clear-hs:hover { background: rgba(139,26,26,0.1); }
+
+  .btn-bag-upgrade {
+    background: linear-gradient(135deg, #1a5c1a, #2a8c2a);
+    border: 1px solid #3aac3a;
+    border-radius: 6px;
+    padding: 3px 10px;
+    font-size: 0.72rem;
+    color: #d4f0d4;
+    cursor: pointer;
+    font-family: 'Cinzel', serif;
+    margin-left: 8px;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+  .btn-bag-upgrade:hover:not(:disabled) { filter: brightness(1.15); }
+  .btn-bag-upgrade:disabled { opacity: 0.45; cursor: not-allowed; background: #444; border-color: #666; color: #999; }
 </style>
 </head>
 <body>
@@ -516,6 +532,7 @@
   <div class="panel">
     <div class="panel-title">🎒 Dein Rucksack
       <span id="bagCount" style="font-size:0.8rem; font-weight:400; color:var(--brown-light); margin-left:auto;"></span>
+      <button id="bagUpgradeBtn" onclick="upgradeBag()" class="btn-bag-upgrade">+1 Platz · 50 🪙</button>
     </div>
     <div class="bag-bar"><div class="bag-fill" id="bagFill"></div></div>
     <div style="height:8px"></div>
@@ -641,7 +658,9 @@ const EVENTS = [
   },
 ];
 
-const BAG_SIZE = 6;
+const BAG_MAX = 6;
+const BAG_START = 3;
+const CARRY_PER_ITEM = 5;
 const START_GOLD = 200;
 const TOTAL_TURNS = 12;
 const WIN_GOLD = 500;
@@ -668,12 +687,13 @@ function initGame() {
     turnsLeft: TOTAL_TURNS,
     currentCity: 'drachenfels',
     bag: [],
+    bagMaxSize: BAG_START,
     cityPrices,
     cityRep,
     log: [
       { msg: '🐉 Willkommen, tapferer Händler! Reise durch die Zauberlande und mache Gewinn!', type: '' },
       { msg: '💡 Tipp: Spezialware (⭐) ist in ihrer Heimatstadt günstig — anderswo teuer!', type: '' },
-      { msg: '🤝 Tipp: Besuche Städte mehrfach — dein Ruf wächst und die Preise verbessern sich!', type: '' },
+      { msg: '🎒 Tipp: Gepäck kostet extra — jedes Item +5 🪙 Reisekosten! Rucksack für 50 🪙 erweitern.', type: '' },
     ],
   };
   render();
@@ -681,7 +701,21 @@ function initGame() {
 
 // ---- HELPERS ----
 function bagCount() { return state.bag.length; }
-function bagFull()  { return state.bag.length >= BAG_SIZE; }
+function bagFull()  { return state.bag.length >= state.bagMaxSize; }
+
+function effectiveTravelCost(cityId) {
+  const city = CITIES.find(c => c.id === cityId);
+  return (city ? city.travelCost : 0) + bagCount() * CARRY_PER_ITEM;
+}
+
+function upgradeBag() {
+  if (state.bagMaxSize >= BAG_MAX) return;
+  if (state.gold < 50) { addLog('💸 Nicht genug Gold für Rucksackerweiterung (50 🪙)!', 'bad'); render(); return; }
+  state.gold -= 50;
+  state.bagMaxSize++;
+  addLog(`🎒 Rucksack erweitert! Jetzt ${state.bagMaxSize} Plätze. (noch ${BAG_MAX - state.bagMaxSize} Erweiterung${BAG_MAX - state.bagMaxSize === 1 ? '' : 'en'} möglich)`, 'good');
+  render();
+}
 
 // Reputation discount: each ⭐ = 3% better price
 function getBuyPrice(cityId, goodId) {
@@ -722,11 +756,12 @@ function triggerEvent() {
 function travel(cityId) {
   const city = CITIES.find(c => c.id === cityId);
   if (!city || cityId === state.currentCity) return;
-  if (city.travelCost > state.gold) {
-    addLog(`⚠️ Nicht genug Gold für die Reise nach ${city.name}!`, 'bad');
+  const cost = effectiveTravelCost(cityId);
+  if (cost > state.gold) {
+    addLog(`⚠️ Nicht genug Gold für die Reise nach ${city.name}! (${city.travelCost} + ${bagCount()}×${CARRY_PER_ITEM} = ${cost} 🪙)`, 'bad');
     render(); return;
   }
-  state.gold -= city.travelCost;
+  state.gold -= cost;
   state.currentCity = cityId;
   state.turnsLeft--;
 
@@ -739,8 +774,13 @@ function travel(cityId) {
     state.cityPrices[cityId][good.id] = Math.max(5, cur + Math.floor((Math.random() - 0.5) * 12));
   });
 
-  if (city.travelCost > 0) addLog(`🗺️ Reise nach ${city.name} kostet ${city.travelCost} 🪙`, 'bad');
-  else addLog(`🏠 Du bist in ${city.name}.`);
+  const bagCarry = bagCount() * CARRY_PER_ITEM;
+  if (cost > 0) {
+    if (bagCarry > 0) addLog(`🗺️ Reise nach ${city.name}: ${city.travelCost} 🪙 + ${bagCount()}×${CARRY_PER_ITEM} 🪙 Gepäck = ${cost} 🪙`, 'bad');
+    else addLog(`🗺️ Reise nach ${city.name} kostet ${cost} 🪙`, 'bad');
+  } else {
+    addLog(`🏠 Du bist in ${city.name}.`);
+  }
 
   const rep = state.cityRep[cityId];
   if (rep > 0) addLog(`🤝 Ruf in ${city.name}: ${'⭐'.repeat(rep)} (${rep * 3}% bessere Preise)`, 'good');
@@ -842,7 +882,7 @@ function render() {
   // Status bar
   document.getElementById('statusBar').innerHTML = `
     <div class="stat-badge"><span class="icon">🪙</span><span>Gold:</span><span class="value">${state.gold}</span></div>
-    <div class="stat-badge"><span class="icon">🎒</span><span>Rucksack:</span><span class="value">${bagCount()}/${BAG_SIZE}</span></div>
+    <div class="stat-badge"><span class="icon">🎒</span><span>Rucksack:</span><span class="value">${bagCount()}/${state.bagMaxSize}</span></div>
     <div class="stat-badge"><span class="icon">⏳</span><span>Runden:</span><span class="value">${state.turnsLeft}</span></div>
     <div class="stat-badge"><span class="icon">🏆</span><span>Ziel:</span><span class="value">${WIN_GOLD} 🪙</span></div>`;
 
@@ -854,15 +894,21 @@ function render() {
   // City map
   document.getElementById('cityMap').innerHTML = CITIES.map(city => {
     const isCurrent = city.id === state.currentCity;
-    const canAfford = city.travelCost <= state.gold;
+    const effCost = isCurrent ? 0 : effectiveTravelCost(city.id);
+    const canAfford = isCurrent || effCost <= state.gold;
     const rep = state.cityRep[city.id] || 0;
+    const carry = bagCount() * CARRY_PER_ITEM;
+    const tip = isCurrent ? 'Du bist hier!' : canAfford
+      ? (carry > 0 ? `Basis ${city.travelCost} + ${bagCount()}×${CARRY_PER_ITEM} Gepäck` : 'Reise hierher')
+      : 'Zu teuer!';
+    const costLabel = isCurrent ? '📍 Hier' : (effCost === 0 ? 'Start' : `${effCost} 🪙`);
     return `<button class="city-btn ${isCurrent ? 'current' : ''} tooltip"
-        data-tip="${isCurrent ? 'Du bist hier!' : canAfford ? 'Reise hierher' : 'Zu teuer!'}"
+        data-tip="${tip}"
         onclick="travel('${city.id}')" ${isCurrent || !canAfford ? 'disabled' : ''}>
       <span class="city-icon">${city.icon}</span>
       <span class="city-name">${city.name}</span>
       <span class="city-tag">${city.tag}</span>
-      <span class="travel-cost">${isCurrent ? '📍 Hier' : (city.travelCost === 0 ? 'Start' : `${city.travelCost} 🪙`)}</span>
+      <span class="travel-cost">${costLabel}</span>
       ${rep > 0 ? `<span class="city-rep">${'⭐'.repeat(rep)}</span>` : ''}
     </button>`;
   }).join('');
@@ -894,11 +940,20 @@ function render() {
   }).join('');
 
   // Inventory
-  const pct = (bagCount() / BAG_SIZE) * 100;
+  const pct = (bagCount() / state.bagMaxSize) * 100;
   const fill = document.getElementById('bagFill');
   fill.style.width = pct + '%';
   fill.className = 'bag-fill' + (bagFull() ? ' full' : '');
-  document.getElementById('bagCount').textContent = `${bagCount()} / ${BAG_SIZE} Plätze`;
+  document.getElementById('bagCount').textContent = `${bagCount()} / ${state.bagMaxSize} Plätze`;
+
+  const upgradeBtn = document.getElementById('bagUpgradeBtn');
+  if (state.bagMaxSize >= BAG_MAX) {
+    upgradeBtn.textContent = '🎒 Voll ausgebaut';
+    upgradeBtn.disabled = true;
+  } else {
+    upgradeBtn.textContent = `+1 Platz · 50 🪙`;
+    upgradeBtn.disabled = state.gold < 50;
+  }
 
   if (bagCount() === 0) {
     document.getElementById('inventory').innerHTML = '<div class="inv-empty">Noch nichts gekauft...</div>';
