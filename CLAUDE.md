@@ -15,4 +15,10 @@ Sprache: immer auf Deutsch antworten.
     braucht Apple Developer Program (99 USD/Jahr) für echte Geräte.
   - Fazit: Für Drachenhandel nicht sinnvoll (Komplett-Neuschreiben in C nötig). Empfehlung: PWA
     (Homescreen, offline, Vollbild) als schneller Weg; für App Store später Capacitor-Wrapper.
-  - Offen: Entscheidung des Users, welcher Weg.
+  - Klarstellung User: Es geht NICHT um Drachenhandel, sondern darum, RetroStoneVC-Spiele (Beispiel für
+    KI-nachgebaute Spiele auf GitHub) selbst auf iPhone/iPad zu testen.
+  - Plan A (bevorzugt): Web-Build per Emscripten (SDL2-Frontend `sdk/frontends/sdl2/rs_sdl.c` + ASYNCIFY;
+    SDK kann Touch nativ) -> Safari auf iPhone/iPad, kein Apple-Konto nötig. Startkandidat: Leady Squid.
+    Installation von emsdk in der Session wurde vom Auto-Mode blockiert -> User-Freigabe nötig.
+  - Plan B: RetroStoneVC forken, vorhandene `.github/workflows/ios.yml` nutzen (macOS-Runner);
+    echtes Gerät braucht Apple Developer (99 USD/Jahr) -> TestFlight; oder unsignierte IPA + Sideloadly/AltStore.
