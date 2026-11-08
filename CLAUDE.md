@@ -37,3 +37,9 @@ Sprache: immer auf Deutsch antworten.
   Spielprinzip. Absprache: KEIN 1:1-Nachbau (Name, Texte, Grafik, Ränge, Zahlen der Originale), sondern ein
   eigenes Spiel im selben Genre (rundenbasierte Wirtschafts-/Handelssimulation, Hot-Seat). Konzept vorgeschlagen,
   Rückfragen gestellt (Fokus, Plattform, Spieler).
+  Entscheidungen: Handel + Herrschaft kombiniert, Hot-Seat 1–4 + KI, modern-illustriert, EIGENES Repo
+  (User muss es anlegen, Vorschlag theossel-sys/salz-und-krone). Arbeitstitel „Salz & Krone“.
+  v0.1 gebaut, liegt vorerst in `salz-und-krone/` auf dem Branch (nicht auf main): engine.js (Logik, Node-fähig),
+  ui.js, style.css, index.html, tests/sim.js (KI-gegen-KI-Balancing), README mit Regeln.
+  10 Hansestädte, 9 Waren, 3 Schiffstypen, Kontore, Lehen (Land/Volk/Getreide/Steuern), 6 Bauten, Fehde,
+  8 Ränge Krämer→Reichsfürst. Zugreihenfolge rotiert (sonst gewinnt Spieler 1 immer). Im Emulator getestet.
