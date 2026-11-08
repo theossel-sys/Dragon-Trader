@@ -39,7 +39,8 @@ Sprache: immer auf Deutsch antworten.
   Rückfragen gestellt (Fokus, Plattform, Spieler).
   Entscheidungen: Handel + Herrschaft kombiniert, Hot-Seat 1–4 + KI, modern-illustriert, EIGENES Repo
   (User muss es anlegen, Vorschlag theossel-sys/salz-und-krone). Arbeitstitel „Salz & Krone“.
-  v0.1 gebaut, liegt vorerst in `salz-und-krone/` auf dem Branch (nicht auf main): engine.js (Logik, Node-fähig),
+  v0.1 gebaut und ins eigene Repo https://github.com/theossel-sys/salz-und-krone umgezogen (main, mit eigener
+  CLAUDE.md dort – weitere Arbeit am Spiel nur dort): engine.js (Logik, Node-fähig),
   ui.js, style.css, index.html, tests/sim.js (KI-gegen-KI-Balancing), README mit Regeln.
   10 Hansestädte, 9 Waren, 3 Schiffstypen, Kontore, Lehen (Land/Volk/Getreide/Steuern), 6 Bauten, Fehde,
   8 Ränge Krämer→Reichsfürst. Zugreihenfolge rotiert (sonst gewinnt Spieler 1 immer). Im Emulator getestet.
