@@ -23,8 +23,10 @@ for f in $XMP; do o=$XO/$(echo $f | tr / _).o
      -Isdk/third_party/libxmp-lite/include/libxmp-lite -Isdk/third_party/libxmp-lite/src -c $f -o $o
 done
 INC="-Isdk/include -Isdk/src -Isdk/third_party/libxmp-lite/include/libxmp-lite -Isdk/third_party/stb \
-     -Isdk/third_party/libretro -Isdk/frontends/common -Igames/$GAME/src -Ibuild/gen/$GAME -Igames/common/src"
-sed -e "s|__NAME__|$NAME|g" -e "s|__HINT__|$HINT|g" "$HERE/shell.html" > $OBJ/shell.html
+     -Isdk/third_party/libretro -Isdk/frontends/common -Igames/$GAME/src -Ibuild/gen/$GAME -Igames/common/src -I$OBJ"
+python3 "$HERE/gen_scheme.py" apps/launcher/games.cfg $GAME $OBJ
+BTNS=$(cat $OBJ/web_buttons.json)
+sed -e "s|__NAME__|$NAME|g" -e "s|__HINT__|$HINT|g" -e "s|__BUTTONS__|$BTNS|g" "$HERE/shell.html" > $OBJ/shell.html
 emcc -std=gnu11 -D_POSIX_C_SOURCE=200809L -O2 -w $INC -sUSE_SDL=2 $SRC $XO/*.o \
      -sALLOW_MEMORY_GROWTH=1 -sINITIAL_MEMORY=64MB -sSTACK_SIZE=1MB -lidbfs.js \
      -sEXPORTED_FUNCTIONS=_main,_web_start,_web_pause -sEXPORTED_RUNTIME_METHODS=ccall,FS \
