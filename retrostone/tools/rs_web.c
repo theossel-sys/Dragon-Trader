@@ -1,0 +1,321 @@
+/*
+ * RetroStone VC: web runner (Emscripten + SDL2), derived from sdk/frontends/sdl2/rs_sdl.c (MIT, (c) 2026
+ * Pierre-Louis Boyer, 8BCraft). For playing in Safari on iPhone / iPad (and any browser).
+ *
+ * - main loop: emscripten_set_main_loop (requestAnimationFrame), fixed 60 Hz steps as in the desktop runner
+ * - the width follows the shape of the viewport (landscape phone: widescreen), rechecked on rotation
+ * - touch: games that read touches get them; the others get the app layer's touch zones
+ *   (apps/launcher/games.cfg) turned into pad buttons; a pause button in the page presses the game's pause input
+ * - save RAM in IndexedDB (IDBFS, /save)
+ */
+#include "rs_desktop.h"
+#include <SDL.h>
+#include <emscripten.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+/* ---- touch schemes (apps/launcher/games.cfg) ---- */
+typedef struct { int x0, y0, x1, y1; uint16_t b; } zone;
+typedef struct { const char *id; int nz; zone z[4]; uint16_t pause; } scheme;
+static const scheme SCHEMES[] = {
+    {"leadysquid",   1, {{0, 0, 100, 100, RS_BTN_A}}, RS_BTN_SELECT},
+    {"pancaketower", 1, {{0, 0, 100, 100, RS_BTN_A}}, RS_BTN_START},
+    {"beaverrush",   2, {{0, 0, 50, 100, RS_BTN_LEFT}, {50, 0, 100, 100, RS_BTN_RIGHT}}, RS_BTN_START},
+    {NULL, 0, {{0}}, RS_BTN_START},          /* any other game: touches go to the game itself */
+};
+static const scheme *sch;
+
+static SDL_GameController *pads[RS_PAD_MAX];
+static const rs_game *g;
+static SDL_Window *win;
+static SDL_Renderer *ren;
+static SDL_Texture *tex;
+static SDL_AudioDeviceID dev;
+static int width, auto_width, pause_frames, check_t, sram_timer;
+static uint64_t freq, frame_ticks, next;
+
+static void open_pads(void)
+{
+    int slot = 0;
+    for (int i = 0; i < RS_PAD_MAX; i++) {
+        if (pads[i]) SDL_GameControllerClose(pads[i]);
+        pads[i] = NULL;
+    }
+    for (int i = 0; i < SDL_NumJoysticks() && slot < RS_PAD_MAX; i++)
+        if (SDL_IsGameController(i) && (pads[slot] = SDL_GameControllerOpen(i))) slot++;
+    for (int p = 0; p < RS_PAD_MAX; p++)
+        rs_host_set_pad_device(p, pads[p] || p > 0 ? RS_DEVICE_PAD : RS_DEVICE_KEYBOARD);
+}
+
+static uint16_t pad_state(SDL_GameController *c)
+{
+    static const struct { SDL_GameControllerButton b; uint16_t bit; } map[] = {
+        {SDL_CONTROLLER_BUTTON_A, RS_BTN_B}, {SDL_CONTROLLER_BUTTON_B, RS_BTN_A},
+        {SDL_CONTROLLER_BUTTON_X, RS_BTN_Y}, {SDL_CONTROLLER_BUTTON_Y, RS_BTN_X},
+        {SDL_CONTROLLER_BUTTON_LEFTSHOULDER, RS_BTN_L}, {SDL_CONTROLLER_BUTTON_RIGHTSHOULDER, RS_BTN_R},
+        {SDL_CONTROLLER_BUTTON_BACK, RS_BTN_SELECT}, {SDL_CONTROLLER_BUTTON_START, RS_BTN_START},
+        {SDL_CONTROLLER_BUTTON_DPAD_UP, RS_BTN_UP}, {SDL_CONTROLLER_BUTTON_DPAD_DOWN, RS_BTN_DOWN},
+        {SDL_CONTROLLER_BUTTON_DPAD_LEFT, RS_BTN_LEFT}, {SDL_CONTROLLER_BUTTON_DPAD_RIGHT, RS_BTN_RIGHT},
+    };
+    uint16_t b = 0;
+    if (!c) return 0;
+    for (unsigned i = 0; i < sizeof map / sizeof map[0]; i++)
+        if (SDL_GameControllerGetButton(c, map[i].b)) b |= map[i].bit;
+    int ax = SDL_GameControllerGetAxis(c, SDL_CONTROLLER_AXIS_LEFTX);
+    int ay = SDL_GameControllerGetAxis(c, SDL_CONTROLLER_AXIS_LEFTY);
+    if (ax < -16000) b |= RS_BTN_LEFT;
+    if (ax > 16000) b |= RS_BTN_RIGHT;
+    if (ay < -16000) b |= RS_BTN_UP;
+    if (ay > 16000) b |= RS_BTN_DOWN;
+    return b;
+}
+
+typedef struct { SDL_Scancode k; uint16_t bit; } keymap;
+static const keymap KEYS_P1[] = {
+    {SDL_SCANCODE_UP, RS_BTN_UP}, {SDL_SCANCODE_DOWN, RS_BTN_DOWN},
+    {SDL_SCANCODE_LEFT, RS_BTN_LEFT}, {SDL_SCANCODE_RIGHT, RS_BTN_RIGHT},
+    {SDL_SCANCODE_Z, RS_BTN_B}, {SDL_SCANCODE_X, RS_BTN_A},
+    {SDL_SCANCODE_C, RS_BTN_Y}, {SDL_SCANCODE_V, RS_BTN_X},
+    {SDL_SCANCODE_Q, RS_BTN_L}, {SDL_SCANCODE_E, RS_BTN_R},
+    {SDL_SCANCODE_RETURN, RS_BTN_START}, {SDL_SCANCODE_SPACE, RS_BTN_A},
+    {SDL_SCANCODE_BACKSPACE, RS_BTN_SELECT}, {SDL_SCANCODE_ESCAPE, RS_BTN_SELECT},
+    {SDL_SCANCODE_UNKNOWN, 0}};
+
+static uint16_t keyboard_state(void)
+{
+    const Uint8 *k = SDL_GetKeyboardState(NULL);
+    uint16_t b = 0;
+    for (const keymap *m = KEYS_P1; m->bit; m++)
+        if (k[m->k]) b |= m->bit;
+    return b;
+}
+
+/* ---- fingers (a lifted finger is kept one frame, so that a quick tap is seen) ---- */
+#define MOUSE_FINGER (-1000)
+static struct { long id; float x, y; int up; } fingers[RS_TOUCH_MAX];
+static int nfingers, mouse_down;
+
+static void finger_set(long id, float x, float y, int up)
+{
+    for (int i = 0; i < nfingers; i++)
+        if (fingers[i].id == id) {
+            fingers[i].x = x;
+            fingers[i].y = y;
+            if (up) fingers[i].up = 1;
+            return;
+        }
+    if (up || nfingers >= RS_TOUCH_MAX) return;
+    fingers[nfingers].id = id;
+    fingers[nfingers].x = x;
+    fingers[nfingers].y = y;
+    fingers[nfingers].up = 0;
+    nfingers++;
+}
+
+/* the scheme's buttons for the fingers down (and those lifted this frame) */
+static uint16_t touch_buttons(void)
+{
+    uint16_t b = 0;
+    if (!sch->nz) return 0;
+    for (int i = 0; i < nfingers; i++) {
+        int px = (int)(fingers[i].x * 100 / width), py = (int)(fingers[i].y * 100 / RS_SCREEN_H);
+        for (int z = 0; z < sch->nz; z++)
+            if (px >= sch->z[z].x0 && px < sch->z[z].x1 && py >= sch->z[z].y0 && py < sch->z[z].y1) {
+                b |= sch->z[z].b;
+                break;
+            }
+    }
+    return b;
+}
+
+static void touches_to_host(void)
+{
+    rs_host_touch t[RS_TOUCH_MAX];
+    int n = sch->nz ? 0 : nfingers;                 /* a game with a scheme gets pad buttons, not touches */
+    for (int i = 0; i < n; i++) {
+        t[i].id = fingers[i].id;
+        t[i].x = (int)fingers[i].x;
+        t[i].y = (int)fingers[i].y;
+    }
+    rs_host_set_touches(n, t);
+    for (int i = 0; i < nfingers;)
+        if (fingers[i].up) fingers[i] = fingers[--nfingers];
+        else i++;
+}
+
+/* ---- the page's side ---- */
+static int viewport_width(void)
+{
+    int vw = EM_ASM_INT({ return (window.visualViewport ? visualViewport.width : innerWidth) | 0; });
+    int vh = EM_ASM_INT({ return (window.visualViewport ? visualViewport.height : innerHeight) | 0; });
+    if (vh <= 0) return RS_SCREEN_W;
+    return rs_host_width_for(g, rs_host_width_for_aspect(vw, vh));
+}
+
+static void fit_canvas(void)
+{
+    EM_ASM({ if (window.rsFit) rsFit($0, $1); }, width, RS_SCREEN_H);
+}
+
+EMSCRIPTEN_KEEPALIVE void web_pause(void) { pause_frames = 6; }
+
+static void save_sync(void)
+{
+    EM_ASM({ FS.syncfs(false, function(e) { if (e) console.log('save sync', e); }); });
+}
+
+static const char *SRAM_PATH;
+static char sram_path[256];
+
+static void tick(void)
+{
+    SDL_Event e;
+    while (SDL_PollEvent(&e)) {
+        if (e.type == SDL_CONTROLLERDEVICEADDED || e.type == SDL_CONTROLLERDEVICEREMOVED) open_pads();
+        else if (e.type == SDL_FINGERDOWN || e.type == SDL_FINGERMOTION || e.type == SDL_FINGERUP)
+            finger_set((long)e.tfinger.fingerId, e.tfinger.x * width, e.tfinger.y * RS_SCREEN_H,
+                       e.type == SDL_FINGERUP);
+        else if ((e.type == SDL_MOUSEBUTTONDOWN || e.type == SDL_MOUSEBUTTONUP) &&
+                 e.button.which != SDL_TOUCH_MOUSEID && e.button.button == SDL_BUTTON_LEFT) {
+            mouse_down = e.type == SDL_MOUSEBUTTONDOWN;
+            finger_set(MOUSE_FINGER, (float)e.button.x, (float)e.button.y, !mouse_down);
+        } else if (e.type == SDL_MOUSEMOTION && e.motion.which != SDL_TOUCH_MOUSEID && mouse_down)
+            finger_set(MOUSE_FINGER, (float)e.motion.x, (float)e.motion.y, 0);
+    }
+
+    uint64_t now = SDL_GetPerformanceCounter();
+    int steps = 0;
+    if (now + frame_ticks * 8 < next || now > next + frame_ticks * 8) next = now;   /* resync (tab was hidden) */
+    while (now >= next && steps < 4) {
+        uint16_t kb = keyboard_state(), tb = touch_buttons();
+        if (pause_frames > 0) {
+            /* down for 3 frames, then up for 3 frames: one press */
+            if (pause_frames > 3) tb |= sch->pause;
+            pause_frames--;
+        }
+        for (int p = 0; p < RS_PAD_MAX; p++) {
+            uint16_t pb = pad_state(pads[p]), b = pb | (p == 0 ? (uint16_t)(kb | tb) : 0);
+            rs_host_set_pad(p, b, p == 0 || pads[p]);
+        }
+        touches_to_host();
+        rs_host_frame();
+        if (dev) {
+            int n;
+            const int16_t *a = rs_host_audio(&n);
+            if (SDL_GetQueuedAudioSize(dev) < (Uint32)(RS_AUDIO_RATE / 8) * 4)
+                SDL_QueueAudio(dev, a, (Uint32)n * 4);
+        }
+        next += frame_ticks;
+        steps++;
+    }
+
+    /* rotation: the width follows the viewport's shape */
+    if (auto_width && ++check_t >= 20) {
+        check_t = 0;
+        int want = viewport_width();
+        if (want != width) {
+            int w = rs_host_change_width(want);
+            if (w != width) {
+                width = w;
+                SDL_DestroyTexture(tex);
+                SDL_SetWindowSize(win, width * 2, RS_SCREEN_H * 2);
+                tex = SDL_CreateTexture(ren, SDL_PIXELFORMAT_RGB565, SDL_TEXTUREACCESS_STREAMING, width, RS_SCREEN_H);
+                SDL_RenderSetLogicalSize(ren, width, RS_SCREEN_H);
+            }
+        }
+        fit_canvas();
+    }
+
+    if (steps) {
+        SDL_UpdateTexture(tex, NULL, rs_host_framebuffer(), width * 2);
+        SDL_RenderClear(ren);
+        SDL_RenderCopy(ren, tex, NULL, NULL);
+        SDL_RenderPresent(ren);
+    }
+    if (rs_host_sram_dirty(0) && ++sram_timer > 30) {
+        rs_host_sram_dirty(1);
+        sram_timer = 0;
+        if (!rsd_sram_save(SRAM_PATH)) save_sync();
+    }
+}
+
+static void log_fn(const char *line) { printf("%s\n", line); }
+
+static int system_lang(void)
+{
+    int l = -1;
+    SDL_Locale *loc = SDL_GetPreferredLocales();
+    for (SDL_Locale *p = loc; p && p->language && l < 0; p++) {
+        char s[48];
+        snprintf(s, sizeof s, "%s%s%s", p->language, p->country ? "_" : "", p->country ? p->country : "");
+        l = rs_lang_find(s);
+        if (l < 0) l = rs_lang_find(p->language);
+    }
+    SDL_free(loc);
+    return l;
+}
+
+/* after IndexedDB has been read into /save */
+EMSCRIPTEN_KEEPALIVE void web_start(void)
+{
+    if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_GAMECONTROLLER) != 0) {
+        printf("SDL_Init: %s\n", SDL_GetError());
+        return;
+    }
+    g = rs_game_main();
+    for (sch = SCHEMES; sch->id && strcmp(sch->id, g->id); sch++) {}
+
+    snprintf(sram_path, sizeof sram_path, "/save/%s.srm", g->id);
+    SRAM_PATH = sram_path;
+    rsd_set_data_dir("/data");
+    rs_host_set_log(log_fn);
+    rs_host_set_file_loader(rsd_data_loader);
+    rsd_sram_load(SRAM_PATH);
+
+    auto_width = g->max_width > RS_SCREEN_W;
+    width = auto_width ? viewport_width() : RS_SCREEN_W;
+    rs_host_set_width(width);
+    int lang = system_lang();
+    if (lang >= 0) rs_host_set_lang(lang);
+    rs_host_init(g);
+    width = rs_screen_width();
+
+    SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "0");
+    SDL_SetHint(SDL_HINT_EMSCRIPTEN_KEYBOARD_ELEMENT, "#canvas");
+    win = SDL_CreateWindow(g->name, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width * 2, RS_SCREEN_H * 2, 0);
+    ren = SDL_CreateRenderer(win, -1, SDL_RENDERER_ACCELERATED);
+    if (!ren) ren = SDL_CreateRenderer(win, -1, 0);
+    SDL_RenderSetLogicalSize(ren, width, RS_SCREEN_H);
+    tex = SDL_CreateTexture(ren, SDL_PIXELFORMAT_RGB565, SDL_TEXTUREACCESS_STREAMING, width, RS_SCREEN_H);
+    fit_canvas();
+
+    SDL_AudioSpec want, have;
+    SDL_zero(want);
+    want.freq = RS_AUDIO_RATE;
+    want.format = AUDIO_S16SYS;
+    want.channels = 2;
+    want.samples = 1024;
+    dev = SDL_OpenAudioDevice(NULL, 0, &want, &have, 0);
+    if (dev) SDL_PauseAudioDevice(dev, 0);
+
+    open_pads();
+    freq = SDL_GetPerformanceFrequency();
+    frame_ticks = freq / RS_FPS;
+    next = SDL_GetPerformanceCounter();
+    EM_ASM({ if (window.rsReady) rsReady(); });
+    emscripten_set_main_loop(tick, 0, 0);
+}
+
+int main(void)
+{
+    EM_ASM({
+        FS.mkdir('/save');
+        FS.mount(IDBFS, {}, '/save');
+        FS.syncfs(true, function(e) {
+            if (e) console.log('load sync', e);
+            Module.ccall('web_start', null, [], []);
+        });
+    });
+    return 0;
+}
