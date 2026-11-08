@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="__NAME__">
+<title>__NAME__</title>
+<style>
+  html, body { margin: 0; height: 100%; background: #000; overflow: hidden; touch-action: none;
+               -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; overscroll-behavior: none; }
+  #stage { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center;
+           padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left); }
+  canvas { display: block; image-rendering: pixelated; image-rendering: crisp-edges; outline: none; }
+  #pause, #back { position: fixed; top: calc(env(safe-area-inset-top) + 8px); width: 44px; height: 44px; border-radius: 22px;
+           border: 2px solid rgba(255,255,255,.55); background: rgba(0,0,0,.35); color: #fff; font: bold 16px system-ui;
+           z-index: 3; display: none; align-items: center; justify-content: center; text-decoration: none; }
+  #pause { right: calc(env(safe-area-inset-right) + 8px); }
+  #back  { left: calc(env(safe-area-inset-left) + 8px); }
+  #start { position: fixed; inset: 0; z-index: 4; display: flex; flex-direction: column; align-items: center;
+           justify-content: center; background: #102040; color: #f4ecd8; font: 600 20px system-ui; text-align: center; gap: 12px; }
+  #start small { font-weight: 400; font-size: 14px; opacity: .75; max-width: 80vw; }
+</style>
+</head>
+<body>
+<div id="stage"><canvas id="canvas" tabindex="-1"></canvas></div>
+<a id="back" href="./" aria-label="Zurück">&#x2190;</a>
+<button id="pause" aria-label="Pause">II</button>
+<div id="start"><div id="msg">Lädt …</div><small>__HINT__</small></div>
+<script>
+  var started = false;
+  function unlockAudio() {
+    try { if (Module.SDL2 && Module.SDL2.audioContext && Module.SDL2.audioContext.state !== 'running') Module.SDL2.audioContext.resume(); } catch (e) {}
+  }
+  ['touchstart', 'touchend', 'mousedown', 'keydown'].forEach(function (t) { document.addEventListener(t, unlockAudio, true); });
+  // fit the canvas (w x h picture) into the safe area, keeping its shape
+  window.rsFit = function (w, h) {
+    var st = document.getElementById('stage'), cs = getComputedStyle(st);
+    var aw = st.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+    var ah = st.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
+    var s = Math.min(aw / w, ah / h), c = document.getElementById('canvas');
+    c.style.setProperty('width', Math.floor(w * s) + 'px', 'important');
+    c.style.setProperty('height', Math.floor(h * s) + 'px', 'important');
+  };
+  window.rsReady = function () {
+    document.getElementById('msg').textContent = 'Antippen zum Starten';
+  };
+  document.getElementById('start').addEventListener('click', function () {
+    unlockAudio();
+    this.style.display = 'none';
+    document.getElementById('pause').style.display = 'flex';
+    document.getElementById('back').style.display = 'flex';
+  });
+  document.getElementById('pause').addEventListener('touchstart', function (e) { e.stopPropagation(); e.preventDefault(); Module._web_pause(); }, {passive: false});
+  document.getElementById('pause').addEventListener('click', function (e) { e.stopPropagation(); Module._web_pause(); });
+  document.addEventListener('visibilitychange', function () { if (document.hidden && Module._web_pause) Module._web_pause(); });
+  document.addEventListener('gesturestart', function (e) { e.preventDefault(); });
+  var Module = {
+    canvas: document.getElementById('canvas'),
+    print: function (t) { console.log(t); }, printErr: function (t) { console.warn(t); },
+  };
+</script>
+{{{ SCRIPT }}}
+</body>
+</html>
