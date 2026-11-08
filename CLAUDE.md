@@ -27,3 +27,5 @@ Sprache: immer auf Deutsch antworten.
     Live, sobald auf main gemerged: https://theossel-sys.github.io/Dragon-Trader/retrostone/
   - Plan B: RetroStoneVC forken, vorhandene `.github/workflows/ios.yml` nutzen (macOS-Runner);
     echtes Gerät braucht Apple Developer (99 USD/Jahr) -> TestFlight; oder unsignierte IPA + Sideloadly/AltStore.
+- 2026-11-08 (später): PR #1 auf main gemerged -> Seite live. User-Feedback: Umsetzung top, Spiele selbst eher
+  nicht so. Komplette Spieleliste (38 Arcade-Spiele + Brettspiel-App) gezeigt, bevor weitere umgesetzt werden.
