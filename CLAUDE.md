@@ -29,3 +29,7 @@ Sprache: immer auf Deutsch antworten.
     echtes Gerät braucht Apple Developer (99 USD/Jahr) -> TestFlight; oder unsignierte IPA + Sideloadly/AltStore.
 - 2026-11-08 (später): PR #1 auf main gemerged -> Seite live. User-Feedback: Umsetzung top, Spiele selbst eher
   nicht so. Komplette Spieleliste (38 Arcade-Spiele + Brettspiel-App) gezeigt, bevor weitere umgesetzt werden.
+- Danach: alle 33 touch-tauglichen Arcade-Spiele gebaut (Schema automatisch aus games.cfg, Overlay-Knöpfe) und
+  RetroStone Board (apps/boardgames, >200 Brett/Karten/Rätsel, 31 MB wasm, ASYNCIFY ohne Threads, Bot synchron
+  über tools/board/ai_worker_web.c) als `retrostone/board/`. Alles im Emulator getestet (Schach gegen Bot ok).
+  Nicht umgesetzt (Touch mäßig): puffinplunge, ladybuglaps, sealshove, goatgorge, bombermole.

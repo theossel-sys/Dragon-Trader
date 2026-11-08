@@ -31,7 +31,9 @@ PAGE = """<!doctype html>
                   calc(env(safe-area-inset-bottom) + 16px) calc(env(safe-area-inset-left) + 16px); box-sizing: border-box; }
   h1 { margin: 0 0 4px; font-size: 24px; color: var(--accent); }
   h2 { margin: 28px 0 2px; font-size: 19px; }
-  h2 + p { margin: 0 0 12px; font-size: 14px; }
+  h1 + h2 { margin-top: 12px; }
+  h2 + p, h3 + p { margin: 0 0 12px; font-size: 14px; }
+  h3 { margin: 22px 0 2px; font-size: 16px; color: var(--accent); }
   p { margin: 0 0 16px; color: var(--muted); max-width: 64ch; }
   .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 14px; }
   a.card { display: block; background: var(--card); border-radius: 14px; overflow: hidden; color: inherit; text-decoration: none; }
@@ -46,8 +48,16 @@ PAGE = """<!doctype html>
 </style>
 </head>
 <body>
-<h1>RetroStone VC – Web</h1>
-<p>__COUNT__ Spiele für iPhone und iPad: Gerät quer halten. Ton gibt es nach dem ersten Antippen; dafür den
+<h1>RetroStone – Web</h1>
+<h2>Brett-, Karten- und Rätselspiele</h2>
+<p>Eine eigene App mit über 200 Spielen: Schach (mit Varianten), Dame, Go, Reversi, Mühle, Shogi, Patiencen, Sudoku,
+   Nonogramme, Puzzles und viele mehr. Gegen den Computer oder zu zweit an einem Gerät. Hochkant und quer.
+   Beim ersten Start werden ca. 30 MB geladen.</p>
+<div class="grid">
+  <a class="card wide" href="board/"><img src="board/cover.png" alt="" loading="lazy"><div><b>RetroStone Board</b><span>Über 200 Brett-, Karten- und Rätselspiele</span><small>Tippen und ziehen wie in einer App</small></div></a>
+</div>
+<h2>Arcade</h2>
+<p>__COUNT__ Arcade-Spiele: Gerät quer halten. Ton gibt es nach dem ersten Antippen; dafür den
    Stummschalter des iPhones ausschalten. Tipp: in Safari „Teilen → Zum Home-Bildschirm“, dann laufen sie im Vollbild.
    Mit „II“ pausierst du, mit „←“ geht es zurück hierher.</p>
 __GROUPS__
@@ -80,7 +90,7 @@ def main():
             cards.append(f'  <a class="card" href="{gid}/"><img src="{gid}/cover.png" alt="" loading="lazy">'
                          f'<div><b>{name}</b><span>{desc}</span><small>{hint}</small></div></a>')
         if cards:
-            out.append(f'<h2>{title}</h2>\n<p>{sub}</p>\n<div class="grid">\n' + "\n".join(cards) + "\n</div>")
+            out.append(f'<h3>{title}</h3>\n<p>{sub}</p>\n<div class="grid">\n' + "\n".join(cards) + "\n</div>")
     missing = set(games) - seen
     if missing:
         sys.exit("not in a group: " + " ".join(sorted(missing)))

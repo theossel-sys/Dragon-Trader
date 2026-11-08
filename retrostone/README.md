@@ -1,8 +1,9 @@
-# RetroStone VC – Web-Build zum Testen auf iPhone/iPad
+# RetroStone – Web-Build zum Testen auf iPhone/iPad
 
-Drei Spiele aus [PaddleStroke/RetroStoneVC](https://github.com/PaddleStroke/RetroStoneVC) (Commit `6116a73`):
-Leady Squid, Pancake Tower und Beaver Rush. Sie wurden unverändert mit Emscripten nach WebAssembly übersetzt und
-laufen in Safari (iPhone/iPad), Chrome und Firefox.
+Aus [PaddleStroke/RetroStoneVC](https://github.com/PaddleStroke/RetroStoneVC) (Commit `6116a73`), unverändert mit
+Emscripten nach WebAssembly übersetzt, läuft in Safari (iPhone/iPad), Chrome und Firefox:
+- **33 Arcade-Spiele** mit guter Touch-Steuerung (Liste: `tools/games.txt`), je ein Ordner `<id>/`
+- **RetroStone Board** (`board/`): die Brettspiel-App mit über 200 Brett-, Karten- und Rätselspielen
 
 ## Spielen
 - Lokal: `cd retrostone && python3 -m http.server 8000` und dann `http://localhost:8000` öffnen. Über `file://`
@@ -25,8 +26,16 @@ git clone https://github.com/PaddleStroke/RetroStoneVC
 pip install pillow numpy scipy fonttools
 sh retrostone/tools/build_web.sh RetroStoneVC retrostone leadysquid "Leady Squid" "Tippen = schwimmen"
 ```
-Weitere Spiele: Spiele, die Touch selbst lesen (z. B. `pogomamie`, `cosmocorgi`), laufen direkt. Für reine
-Pad-Spiele muss ihre Zeile aus `games.cfg` in die Tabelle `SCHEMES` in `rs_web.c` eingetragen werden.
+Alle Arcade-Spiele auf einmal: `sh retrostone/tools/build_all.sh RetroStoneVC retrostone` und danach
+`python3 retrostone/tools/gen_index.py retrostone` für das Menü. Das Touch-Schema jedes Spiels liest
+`tools/gen_scheme.py` aus `apps/launcher/games.cfg`. Spiele mit `touch_native` bekommen die Finger direkt.
+
+Brettspiel-App: `sh retrostone/tools/board/build_board.sh RetroStoneVC retrostone`. Dafür werden außerdem
+`fonts-noto-cjk` und `fonts-dejavu-core` (apt) sowie `fonttools` (pip) gebraucht. Sie läuft ohne Threads
+(`ASYNCIFY`), und der Computergegner rechnet auf dem Hauptthread (`tools/board/ai_worker_web.c`).
+
+Hinweis: Hinter einem Proxy, der GitHub-Archive blockiert, SDL per `git clone -b release-2.32.10` holen und
+`EMCC_LOCAL_PORTS=sdl2=<pfad>` setzen.
 
 ## Lizenz
 Code MIT, Assets CC BY-NC-SA 4.0 (© 2026 Pierre-Louis Boyer, 8BCraft), nur nicht-kommerziell.
