@@ -33,3 +33,7 @@ Sprache: immer auf Deutsch antworten.
   RetroStone Board (apps/boardgames, >200 Brett/Karten/Rätsel, 31 MB wasm, ASYNCIFY ohne Threads, Bot synchron
   über tools/board/ai_worker_web.c) als `retrostone/board/`. Alles im Emulator getestet (Schach gegen Bot ok).
   Nicht umgesetzt (Touch mäßig): puffinplunge, ladybuglaps, sealshove, goatgorge, bombermole.
+- Neues eigenes Projekt (Anfrage): User liebte "Hanse" und "Kaiser" (Ascon, 80er) und will etwas mit gleichem
+  Spielprinzip. Absprache: KEIN 1:1-Nachbau (Name, Texte, Grafik, Ränge, Zahlen der Originale), sondern ein
+  eigenes Spiel im selben Genre (rundenbasierte Wirtschafts-/Handelssimulation, Hot-Seat). Konzept vorgeschlagen,
+  Rückfragen gestellt (Fokus, Plattform, Spieler).
