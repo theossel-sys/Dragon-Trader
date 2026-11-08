@@ -6,33 +6,88 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="RetroStone Web">
-<title>RetroStone Web-Test</title>
+<meta name="apple-mobile-web-app-title" content="RetroStone">
+<title>RetroStone Web</title>
 <style>
   :root { --bg: #102040; --card: #1c3260; --fg: #f4ecd8; --muted: #b9c3d9; --accent: #ffd34d; }
   body { margin: 0; min-height: 100vh; background: var(--bg); color: var(--fg); font: 16px/1.45 system-ui, sans-serif;
          padding: calc(env(safe-area-inset-top) + 16px) calc(env(safe-area-inset-right) + 16px)
                   calc(env(safe-area-inset-bottom) + 16px) calc(env(safe-area-inset-left) + 16px); box-sizing: border-box; }
   h1 { margin: 0 0 4px; font-size: 24px; color: var(--accent); }
-  p { margin: 0 0 16px; color: var(--muted); max-width: 60ch; }
-  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 16px; }
+  h2 { margin: 28px 0 2px; font-size: 19px; }
+  h1 + h2 { margin-top: 12px; }
+  h2 + p, h3 + p { margin: 0 0 12px; font-size: 14px; }
+  h3 { margin: 22px 0 2px; font-size: 16px; color: var(--accent); }
+  p { margin: 0 0 16px; color: var(--muted); max-width: 64ch; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 14px; }
   a.card { display: block; background: var(--card); border-radius: 14px; overflow: hidden; color: inherit; text-decoration: none; }
+  a.card:active { transform: scale(.98); }
   a.card img { display: block; width: 100%; aspect-ratio: 4 / 3; object-fit: cover; image-rendering: pixelated; }
-  a.card div { padding: 10px 14px 14px; }
-  a.card b { display: block; font-size: 18px; }
-  a.card span { font-size: 14px; color: var(--muted); }
-  footer { margin-top: 24px; font-size: 13px; color: var(--muted); max-width: 70ch; }
+  a.card div { padding: 8px 12px 12px; }
+  a.card b { display: block; font-size: 17px; }
+  a.card span { display: block; font-size: 14px; color: var(--fg); opacity: .9; }
+  a.card small { display: block; font-size: 12.5px; color: var(--muted); margin-top: 4px; }
+  footer { margin-top: 28px; font-size: 13px; color: var(--muted); max-width: 72ch; }
   footer a { color: var(--accent); }
 </style>
 </head>
 <body>
-<h1>RetroStone VC – Web-Test</h1>
-<p>Testversion für iPhone und iPad: Gerät quer halten. Ton gibt es nach dem ersten Antippen; der Stummschalter
-   des iPhones muss dafür aus sein. Tipp: in Safari „Teilen → Zum Home-Bildschirm“, dann läuft es im Vollbild.</p>
+<h1>RetroStone – Web</h1>
+<h2>Brett-, Karten- und Rätselspiele</h2>
+<p>Eine eigene App mit über 200 Spielen: Schach (mit Varianten), Dame, Go, Reversi, Mühle, Shogi, Patiencen, Sudoku,
+   Nonogramme, Puzzles und viele mehr. Gegen den Computer oder zu zweit an einem Gerät. Hochkant und quer.
+   Beim ersten Start werden ca. 30 MB geladen.</p>
 <div class="grid">
-  <a class="card" href="leadysquid/"><img src="leadysquid/cover.png" alt=""><div><b>Leady Squid</b><span>Tippen = schwimmen</span></div></a>
-  <a class="card" href="pancaketower/"><img src="pancaketower/cover.png" alt=""><div><b>Pancake Tower</b><span>Tippen = Pfannkuchen fallen lassen</span></div></a>
-  <a class="card" href="beaverrush/"><img src="beaverrush/cover.png" alt=""><div><b>Beaver Rush</b><span>Linke / rechte Hälfte = nagen</span></div></a>
+  <a class="card wide" href="board/"><img src="board/cover.png" alt="" loading="lazy"><div><b>RetroStone Board</b><span>Über 200 Brett-, Karten- und Rätselspiele</span><small>Tippen und ziehen wie in einer App</small></div></a>
+</div>
+<h2>Arcade</h2>
+<p>33 Arcade-Spiele: Gerät quer halten. Ton gibt es nach dem ersten Antippen; dafür den
+   Stummschalter des iPhones ausschalten. Tipp: in Safari „Teilen → Zum Home-Bildschirm“, dann laufen sie im Vollbild.
+   Mit „II“ pausierst du, mit „←“ geht es zurück hierher.</p>
+<h3>Ein Knopf</h3>
+<p>Tippen oder halten, irgendwo auf dem Bildschirm</p>
+<div class="grid">
+  <a class="card" href="leadysquid/"><img src="leadysquid/cover.png" alt="" loading="lazy"><div><b>Leady Squid</b><span>Tintenfisch mit Bleigewichten schwimmt durch Lücken</span><small>Tippen = schwimmen</small></div></a>
+  <a class="card" href="pancaketower/"><img src="pancaketower/cover.png" alt="" loading="lazy"><div><b>Pancake Tower</b><span>Pfannkuchen genau stapeln</span><small>Tippen = Pfannkuchen fallen lassen</small></div></a>
+  <a class="card" href="frogreach/"><img src="frogreach/cover.png" alt="" loading="lazy"><div><b>Frog Reach</b><span>Froschzunge zum nächsten Seerosenblatt</span><small>Halten = Zunge wächst, loslassen = festhalten</small></div></a>
+  <a class="card" href="hedgehoghills/"><img src="hedgehoghills/cover.png" alt="" loading="lazy"><div><b>Hedgehog Hills</b><span>Igel rollt durch Hügel nach Hause</span><small>Halten = einrollen und bergab rasen</small></div></a>
+  <a class="card" href="mouseespresso/"><img src="mouseespresso/cover.png" alt="" loading="lazy"><div><b>Mouse Espresso</b><span>Maus mit Espresso-Jetpack flieht durchs Café</span><small>Halten = steigen, loslassen = sinken</small></div></a>
+  <a class="card" href="unicornhop/"><img src="unicornhop/cover.png" alt="" loading="lazy"><div><b>Unicorn Hop</b><span>Einhorn hüpft von Wolke zu Wolke</span><small>Tippen = springen</small></div></a>
+  <a class="card" href="blueberrytumble/"><img src="blueberrytumble/cover.png" alt="" loading="lazy"><div><b>Blueberry Tumble</b><span>Blaubeere hüpft nach oben</span><small>Tippen = springen</small></div></a>
+  <a class="card" href="snailswitch/"><img src="snailswitch/cover.png" alt="" loading="lazy"><div><b>Snail Switch</b><span>Schnecke wechselt die Seite der Ranke</span><small>Tippen = Seite wechseln</small></div></a>
+</div>
+<h3>Links / rechts</h3>
+<p>Linke und rechte Bildschirmhälfte</p>
+<div class="grid">
+  <a class="card" href="beaverrush/"><img src="beaverrush/cover.png" alt="" loading="lazy"><div><b>Beaver Rush</b><span>Biber nagt den Baum ab, Ästen ausweichen</span><small>Linke / rechte Hälfte = links / rechts nagen</small></div></a>
+  <a class="card" href="motharound/"><img src="motharound/cover.png" alt="" loading="lazy"><div><b>Moth Around</b><span>Motte kreist um die Laterne durch Lücken</span><small>Linke / rechte Hälfte halten = drehen</small></div></a>
+  <a class="card" href="penguinslalom/"><img src="penguinslalom/cover.png" alt="" loading="lazy"><div><b>Penguin Slalom</b><span>Pinguin fährt Slalom bergab</span><small>Linke / rechte Hälfte halten = lenken</small></div></a>
+  <a class="card" href="otterrapids/"><img src="otterrapids/cover.png" alt="" loading="lazy"><div><b>Otter Rapids</b><span>Otter paddelt durch Stromschnellen</span><small>Linke / rechte Hälfte halten = paddeln</small></div></a>
+  <a class="card" href="crabcoconut/"><img src="crabcoconut/cover.png" alt="" loading="lazy"><div><b>Crab Coconut</b><span>Krabbe jongliert die Kokosnuss gegen Muscheln</span><small>Linke / rechte Hälfte halten = laufen</small></div></a>
+  <a class="card" href="biscuitbandit/"><img src="biscuitbandit/cover.png" alt="" loading="lazy"><div><b>Biscuit Bandit</b><span>Waschbär fängt fallende Kekse</span><small>Linke / rechte Hälfte halten = laufen</small></div></a>
+  <a class="card" href="hamsterhavoc/"><img src="hamsterhavoc/cover.png" alt="" loading="lazy"><div><b>Hamster Havoc</b><span>Hamster-Raumschiff gegen Weltraummäuse</span><small>Hälften = fliegen, Kreis-Knöpfe = schießen</small></div></a>
+  <a class="card" href="molemarbles/"><img src="molemarbles/cover.png" alt="" loading="lazy"><div><b>Mole Marbles</b><span>Maulwurf zerschießt hüpfende Edelsteine</span><small>Hälften halten = laufen, Kreis-Knöpfe = Harpune</small></div></a>
+</div>
+<h3>Echte Touch-Steuerung</h3>
+<p>Tippen auf Stellen, ziehen, wischen</p>
+<div class="grid">
+  <a class="card" href="spiderswing/"><img src="spiderswing/cover.png" alt="" loading="lazy"><div><b>Spider Swing</b><span>Spinne schwingt am Faden nach oben</span><small>Tippen = loslassen, Hälften halten = lenken</small></div></a>
+  <a class="card" href="pogomamie/"><img src="pogomamie/cover.png" alt="" loading="lazy"><div><b>Pogo Mamie</b><span>Oma auf dem Pogostab jagt ihre Katze über Paris</span><small>Hälften halten = lenken, nach oben wischen = großer Sprung</small></div></a>
+  <a class="card" href="lemurleap/"><img src="lemurleap/cover.png" alt="" loading="lazy"><div><b>Lemur Leap</b><span>Lemur hüpft endlos nach oben</span><small>Hälften halten = lenken, zweiter Finger / Tippen = schießen</small></div></a>
+  <a class="card" href="duckparade/"><img src="duckparade/cover.png" alt="" loading="lazy"><div><b>Duck Parade</b><span>Entenmama sammelt Küken über Straßen und Flüsse</span><small>Auf eine Stelle tippen = dorthin hüpfen</small></div></a>
+  <a class="card" href="nuttybranch/"><img src="nuttybranch/cover.png" alt="" loading="lazy"><div><b>Nutty Branch</b><span>Eichhörnchen rennt den Ast entlang</span><small>Hälften halten = lenken, nach oben wischen = springen</small></div></a>
+  <a class="card" href="pricklepatch/"><img src="pricklepatch/cover.png" alt="" loading="lazy"><div><b>Prickle Patch</b><span>Igel überlebt Gegnerwellen, Waffen schießen selbst</span><small>Finger aufsetzen und ziehen = laufen, Tippen = Upgrade wählen</small></div></a>
+  <a class="card" href="raccoonrecycler/"><img src="raccoonrecycler/cover.png" alt="" loading="lazy"><div><b>Raccoon Recycler</b><span>Waschbär sortiert Spielzeug am Fließband</span><small>Auf die richtige Weiche tippen</small></div></a>
+  <a class="card" href="radishrascals/"><img src="radishrascals/cover.png" alt="" loading="lazy"><div><b>Radish Rascals</b><span>Bauer verscheucht Hasen aus vier Beeten</span><small>Auf das Beet tippen</small></div></a>
+  <a class="card" href="cosmocorgi/"><img src="cosmocorgi/cover.png" alt="" loading="lazy"><div><b>Cosmo Corgi</b><span>Corgi-Astronaut gegen Aufzieh-Roboter</span><small>Finger ziehen = fliegen, Schüsse automatisch</small></div></a>
+  <a class="card" href="geckogolf/"><img src="geckogolf/cover.png" alt="" loading="lazy"><div><b>Gecko Golf</b><span>Gecko spielt endlos Golf</span><small>Finger aufsetzen, zurückziehen (Schleuder), loslassen = schlagen</small></div></a>
+  <a class="card" href="fishyfeast/"><img src="fishyfeast/cover.png" alt="" loading="lazy"><div><b>Fishy Feast</b><span>Kleiner Fisch frisst sich groß</span><small>Linker Bereich = Steuerstick, unten rechts = teilen / ausstoßen</small></div></a>
+  <a class="card" href="caterpillarcrawl/"><img src="caterpillarcrawl/cover.png" alt="" loading="lazy"><div><b>Caterpillar Crawl</b><span>Raupe frisst Blätter und wird länger</span><small>Wischen = Richtung ändern</small></div></a>
+  <a class="card" href="jellyjam/"><img src="jellyjam/cover.png" alt="" loading="lazy"><div><b>Jelly Jam</b><span>Gelee-Puzzle-Duell: vier gleiche Farben</span><small>Seitlich ziehen = Spalte, nach unten ziehen = schneller, Tippen = drehen</small></div></a>
+  <a class="card" href="kittykibble/"><img src="kittykibble/cover.png" alt="" loading="lazy"><div><b>Kitty Kibble</b><span>Kätzchen frisst Futter, Saugroboter jagen es</span><small>Wischen = Richtung ändern</small></div></a>
+  <a class="card" href="llamadrama/"><img src="llamadrama/cover.png" alt="" loading="lazy"><div><b>Llama Drama</b><span>Lama spuckt auf Hornissen</span><small>Ziehen = Hals heben / senken, Tippen = spucken</small></div></a>
+  <a class="card" href="gopherdig/"><img src="gopherdig/cover.png" alt="" loading="lazy"><div><b>Gopher Dig</b><span>Ziesel bohrt sich durch bunte Blöcke</span><small>Auf einen Block tippen = dorthin bohren</small></div></a>
+  <a class="card" href="snowballsiege/"><img src="snowballsiege/cover.png" alt="" loading="lazy"><div><b>Snowball Siege</b><span>Rundenbasierte Schneeballschlacht mit Wind</span><small>Ziehen = zielen und laden, loslassen = werfen</small></div></a>
 </div>
 <footer>
   Spiele von <a href="https://github.com/PaddleStroke/RetroStoneVC">RetroStone VC</a>, © 2026 Pierre-Louis Boyer (8BCraft).

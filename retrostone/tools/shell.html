@@ -13,6 +13,12 @@
                -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; overscroll-behavior: none; }
   #stage { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center;
            padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left); }
+  #wrap { position: relative; }
+  #btns { position: absolute; inset: 0; pointer-events: none; display: none; }
+  #btns div { position: absolute; display: flex; align-items: center; justify-content: center; }
+  #btns span { width: 64%; aspect-ratio: 1; max-width: 72px; border-radius: 50%; border: 2px solid rgba(255,255,255,.6);
+               background: rgba(255,255,255,.14); color: rgba(255,255,255,.85); font: bold 22px system-ui;
+               display: flex; align-items: center; justify-content: center; }
   canvas { display: block; image-rendering: pixelated; image-rendering: crisp-edges; outline: none; }
   #pause, #back { position: fixed; top: calc(env(safe-area-inset-top) + 8px); width: 44px; height: 44px; border-radius: 22px;
            border: 2px solid rgba(255,255,255,.55); background: rgba(0,0,0,.35); color: #fff; font: bold 16px system-ui;
@@ -25,7 +31,7 @@
 </style>
 </head>
 <body>
-<div id="stage"><canvas id="canvas" tabindex="-1"></canvas></div>
+<div id="stage"><div id="wrap"><canvas id="canvas" tabindex="-1"></canvas><div id="btns"></div></div></div>
 <a id="back" href="./" aria-label="Zurück">&#x2190;</a>
 <button id="pause" aria-label="Pause">II</button>
 <div id="start"><div id="msg">Lädt …</div><small>__HINT__</small></div>
@@ -41,8 +47,22 @@
     var aw = st.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
     var ah = st.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
     var s = Math.min(aw / w, ah / h), c = document.getElementById('canvas');
-    c.style.setProperty('width', Math.floor(w * s) + 'px', 'important');
-    c.style.setProperty('height', Math.floor(h * s) + 'px', 'important');
+    var W = Math.floor(w * s) + 'px', H = Math.floor(h * s) + 'px', wr = document.getElementById('wrap');
+    c.style.setProperty('width', W, 'important'); c.style.setProperty('height', H, 'important');
+    wr.style.width = W; wr.style.height = H;
+  };
+  // the drawn touch buttons of the game's scheme (games.cfg "button="), as an overlay that lets touches through
+  var BUTTONS = __BUTTONS__;
+  window.rsButtons = function (nzones) {
+    var box = document.getElementById('btns');
+    if (!nzones || !BUTTONS.length) return;
+    BUTTONS.forEach(function (b) {
+      var r = b.r, d = document.createElement('div'), tall = (r[3] - r[1]) > (r[2] - r[0]) * 1.2;
+      d.style.left = r[0] + '%'; d.style.width = (r[2] - r[0]) + '%';
+      d.style.top = (tall ? r[3] - (r[2] - r[0]) * 1.6 : r[1]) + '%'; d.style.height = (tall ? (r[2] - r[0]) * 1.6 : r[3] - r[1]) + '%';
+      var sp = document.createElement('span'); sp.textContent = b.t; d.appendChild(sp); box.appendChild(d);
+    });
+    box.style.display = 'block';
   };
   window.rsReady = function () {
     document.getElementById('msg').textContent = 'Antippen zum Starten';

@@ -1,0 +1,34 @@
+# id|Name|Kurzbeschreibung|Steuerung (Touch)
+leadysquid|Leady Squid|Tintenfisch mit Bleigewichten schwimmt durch Lücken|Tippen = schwimmen
+pancaketower|Pancake Tower|Pfannkuchen genau stapeln|Tippen = Pfannkuchen fallen lassen
+frogreach|Frog Reach|Froschzunge zum nächsten Seerosenblatt|Halten = Zunge wächst, loslassen = festhalten
+hedgehoghills|Hedgehog Hills|Igel rollt durch Hügel nach Hause|Halten = einrollen und bergab rasen
+mouseespresso|Mouse Espresso|Maus mit Espresso-Jetpack flieht durchs Café|Halten = steigen, loslassen = sinken
+unicornhop|Unicorn Hop|Einhorn hüpft von Wolke zu Wolke|Tippen = springen
+blueberrytumble|Blueberry Tumble|Blaubeere hüpft nach oben|Tippen = springen
+snailswitch|Snail Switch|Schnecke wechselt die Seite der Ranke|Tippen = Seite wechseln
+beaverrush|Beaver Rush|Biber nagt den Baum ab, Ästen ausweichen|Linke / rechte Hälfte = links / rechts nagen
+motharound|Moth Around|Motte kreist um die Laterne durch Lücken|Linke / rechte Hälfte halten = drehen
+penguinslalom|Penguin Slalom|Pinguin fährt Slalom bergab|Linke / rechte Hälfte halten = lenken
+otterrapids|Otter Rapids|Otter paddelt durch Stromschnellen|Linke / rechte Hälfte halten = paddeln
+crabcoconut|Crab Coconut|Krabbe jongliert die Kokosnuss gegen Muscheln|Linke / rechte Hälfte halten = laufen
+biscuitbandit|Biscuit Bandit|Waschbär fängt fallende Kekse|Linke / rechte Hälfte halten = laufen
+hamsterhavoc|Hamster Havoc|Hamster-Raumschiff gegen Weltraummäuse|Hälften = fliegen, Kreis-Knöpfe = schießen
+molemarbles|Mole Marbles|Maulwurf zerschießt hüpfende Edelsteine|Hälften halten = laufen, Kreis-Knöpfe = Harpune
+spiderswing|Spider Swing|Spinne schwingt am Faden nach oben|Tippen = loslassen, Hälften halten = lenken
+pogomamie|Pogo Mamie|Oma auf dem Pogostab jagt ihre Katze über Paris|Hälften halten = lenken, nach oben wischen = großer Sprung
+lemurleap|Lemur Leap|Lemur hüpft endlos nach oben|Hälften halten = lenken, zweiter Finger / Tippen = schießen
+duckparade|Duck Parade|Entenmama sammelt Küken über Straßen und Flüsse|Auf eine Stelle tippen = dorthin hüpfen
+nuttybranch|Nutty Branch|Eichhörnchen rennt den Ast entlang|Hälften halten = lenken, nach oben wischen = springen
+pricklepatch|Prickle Patch|Igel überlebt Gegnerwellen, Waffen schießen selbst|Finger aufsetzen und ziehen = laufen, Tippen = Upgrade wählen
+raccoonrecycler|Raccoon Recycler|Waschbär sortiert Spielzeug am Fließband|Auf die richtige Weiche tippen
+radishrascals|Radish Rascals|Bauer verscheucht Hasen aus vier Beeten|Auf das Beet tippen
+cosmocorgi|Cosmo Corgi|Corgi-Astronaut gegen Aufzieh-Roboter|Finger ziehen = fliegen, Schüsse automatisch
+geckogolf|Gecko Golf|Gecko spielt endlos Golf|Finger aufsetzen, zurückziehen (Schleuder), loslassen = schlagen
+fishyfeast|Fishy Feast|Kleiner Fisch frisst sich groß|Linker Bereich = Steuerstick, unten rechts = teilen / ausstoßen
+caterpillarcrawl|Caterpillar Crawl|Raupe frisst Blätter und wird länger|Wischen = Richtung ändern
+jellyjam|Jelly Jam|Gelee-Puzzle-Duell: vier gleiche Farben|Seitlich ziehen = Spalte, nach unten ziehen = schneller, Tippen = drehen
+kittykibble|Kitty Kibble|Kätzchen frisst Futter, Saugroboter jagen es|Wischen = Richtung ändern
+llamadrama|Llama Drama|Lama spuckt auf Hornissen|Ziehen = Hals heben / senken, Tippen = spucken
+gopherdig|Gopher Dig|Ziesel bohrt sich durch bunte Blöcke|Auf einen Block tippen = dorthin bohren
+snowballsiege|Snowball Siege|Rundenbasierte Schneeballschlacht mit Wind|Ziehen = zielen und laden, loslassen = werfen
