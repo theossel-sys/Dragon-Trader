@@ -1,0 +1,20 @@
+{
+  "game": "Rotorsturm",
+  "images": {
+    "heli_player":   { "size": [20, 24], "mode": "pixel", "note": "Spieler-Hubschrauber" },
+    "tank":          { "size": [14, 16], "mode": "pixel", "note": "Panzer (Wanne, Turm wird im Spiel gedreht)" },
+    "truck":         { "size": [10, 14], "mode": "pixel", "note": "Versorgungslaster (bringt Extras)" },
+    "boat":          { "size": [10, 18], "mode": "pixel", "note": "Kanonenboot" },
+    "jet":           { "size": [16, 16], "mode": "pixel", "note": "feindlicher Jet" },
+    "heli_enemy":    { "size": [16, 16], "mode": "pixel", "note": "feindlicher Hubschrauber" },
+    "bunker":        { "size": [14, 14], "mode": "pixel", "note": "Bunker mit Geschütz" },
+    "boss_destroyer":{ "size": [56, 128], "mode": "pixel", "note": "Endgegner Zone 1" },
+    "boss_tank":     { "size": [68, 76], "mode": "pixel", "note": "Endgegner Zone 2" },
+    "boss_bunker":   { "size": [124, 68], "mode": "pixel", "note": "Endgegner Zone 3" },
+    "boss_heli":     { "size": [84, 72], "mode": "pixel", "note": "Endgegner Zone 4" },
+    "item_power":    { "size": [14, 14], "mode": "pixel", "note": "Extra P" },
+    "item_bomb":     { "size": [14, 14], "mode": "pixel", "note": "Extra B" },
+    "item_shield":   { "size": [14, 14], "mode": "pixel", "note": "Extra S" },
+    "title":         { "size": [720, 1280], "mode": "smooth", "keep_background": true, "note": "Titelbild hochkant" }
+  }
+}

@@ -50,3 +50,5 @@ Sprache: immer auf Deutsch antworten.
   Pixel-Sprites, Kachel-Gelände 8x8 prozedural, 3x5-Pixelschrift, 4 Zonen Küste/Wald/Industrie/Flugfeld mit Bossen
   Zerstörer/Festungspanzer/Bunkerwerk/Sturmbrecher, Extras P/B/S, Web-Audio-Chiptune). Liegt vorerst auf dem Branch;
   User fragen: eigenes Repo oder auf main (dann unter /Dragon-Trader/rotorsturm/ spielbar).
+  Draw-Things-Workflow für Rotorsturm: rotorsturm/art/PROMPTS.md (Pixel-Art-Prompts, Magenta-Hintergrund),
+  Upload nach rotorsturm/art/incoming/, `python3 rotorsturm/tools/import_art.py` → rotorsturm/assets/. Einbau offen.
