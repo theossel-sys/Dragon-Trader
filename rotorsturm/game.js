@@ -157,6 +157,22 @@ const SPR = {
 };
 const FLASH = {};
 Object.keys(SPR).forEach(k => { FLASH[k] = flashOf(SPR[k]); });
+// Grafiken aus Draw Things (assets/); bis sie geladen sind – oder wenn eine fehlt – bleiben die Code-Sprites
+const ART = { loaded: {} };
+function loadArt(file, onload) {
+  const im = new Image();
+  im.onload = () => { const c = document.createElement('canvas'); c.width = im.width; c.height = im.height; c.getContext('2d').drawImage(im, 0, 0); onload(c); };
+  im.src = 'assets/' + file + '.png';
+}
+[['heli_player', 'player'], ['tank', 'tank'], ['truck', 'truck'], ['boat', 'boat'], ['jet', 'jet'], ['heli_enemy', 'copter'], ['bunker', 'bunker']]
+  .forEach(([file, key]) => loadArt(file, c => { SPR[key] = c; FLASH[key] = flashOf(c); ART.loaded[key] = true; }));
+['item_power', 'item_bomb', 'item_shield'].forEach(k => loadArt(k, c => { ART[k] = c; }));
+function silhouette(src) {
+  const c = document.createElement('canvas'); c.width = src.width; c.height = src.height;
+  const x = c.getContext('2d'); x.drawImage(src, 0, 0); x.globalCompositeOperation = 'source-atop'; x.fillStyle = '#000'; x.fillRect(0, 0, c.width, c.height);
+  return c;
+}
+['boss_destroyer', 'boss_tank', 'boss_bunker', 'boss_heli'].forEach((k, i) => loadArt(k, c => { ART[k] = c; ART[k + '_flash'] = flashOf(c); ART[k + '_shadow'] = silhouette(c); }));
 
 // ---------------------------------------------------------------- Pixelschrift 3x5
 const FONT = {
@@ -368,10 +384,10 @@ const bulletSpeed = () => 62 + 16 * G.loop + (G.zone % 4) * 4;
 
 // ---------------------------------------------------------------- Endgegner
 const BOSSES = [
-  { name: 'ZERSTOERER', w: 50, h: 120, hp: 220, guns: [[0, -38], [0, 2], [0, 38]], pats: ['aimed', 'fan', 'aimed', 'ring'], move: 'sway', draw: drawDestroyer },
-  { name: 'FESTUNGSPANZER', w: 64, h: 70, hp: 260, guns: [[-16, 22], [16, 22]], pats: ['fan', 'aimed', 'stream'], move: 'creep', draw: drawBigTank },
-  { name: 'BUNKERWERK', w: 120, h: 64, hp: 320, guns: [[-44, 4], [44, 4], [0, 14]], pats: ['ring', 'aimed', 'fan', 'stream'], move: 'none', draw: drawBunkerBoss },
-  { name: 'STURMBRECHER', w: 76, h: 60, hp: 300, guns: [[-26, 14], [26, 14], [0, 22]], pats: ['stream', 'fan', 'ring', 'aimed'], move: 'fly', draw: drawBossHeli },
+  { art: 'boss_destroyer', name: 'ZERSTOERER', w: 50, h: 120, hp: 220, guns: [[0, -38], [0, 2], [0, 38]], pats: ['aimed', 'fan', 'aimed', 'ring'], move: 'sway', draw: drawDestroyer },
+  { art: 'boss_tank', name: 'FESTUNGSPANZER', w: 64, h: 70, hp: 260, guns: [[-16, 22], [16, 22]], pats: ['fan', 'aimed', 'stream'], move: 'creep', draw: drawBigTank },
+  { art: 'boss_bunker', name: 'BUNKERWERK', w: 120, h: 64, hp: 320, guns: [[-44, 4], [44, 4], [0, 14]], pats: ['ring', 'aimed', 'fan', 'stream'], move: 'none', draw: drawBunkerBoss },
+  { art: 'boss_heli', name: 'STURMBRECHER', w: 76, h: 60, hp: 300, guns: [[-26, 14], [26, 14], [0, 22]], pats: ['stream', 'fan', 'ring', 'aimed'], move: 'fly', draw: drawBossHeli },
 ];
 function startBoss() {
   const def = BOSSES[G.zone % 4];
@@ -652,11 +668,11 @@ function draw(noHud) {
     const fl = f.flash > 0;
     if (f.type === 'tank') {
       blit(SPR.tank, f.x, f.y, fl && FLASH.tank);
-      ctx.fillStyle = fl ? '#fff' : '#55642a'; ctx.fillRect(Math.round(f.x) - 3, Math.round(f.y) - 3, 6, 6);
+      if (!ART.loaded.tank) { ctx.fillStyle = fl ? '#fff' : '#55642a'; ctx.fillRect(Math.round(f.x) - 3, Math.round(f.y) - 3, 6, 6); }
       drawLine(f.x, f.y, f.x + Math.cos(f.ang) * 8, f.y + Math.sin(f.ang) * 8, '#1e2412');
     } else if (f.type === 'bunker') {
       blit(SPR.bunker, f.x, f.y, fl && FLASH.bunker);
-      ctx.fillStyle = fl ? '#fff' : '#3f444b'; ctx.fillRect(Math.round(f.x) - 2, Math.round(f.y) - 2, 4, 4);
+      if (!ART.loaded.bunker) { ctx.fillStyle = fl ? '#fff' : '#3f444b'; ctx.fillRect(Math.round(f.x) - 2, Math.round(f.y) - 2, 4, 4); }
       drawLine(f.x, f.y, f.x + Math.cos(f.ang) * 7, f.y + Math.sin(f.ang) * 7, '#141414');
     } else if (f.type === 'boat') {
       ctx.fillStyle = 'rgba(255,255,255,.35)'; ctx.fillRect(Math.round(f.x) - 3, Math.round(f.y) + 7, 6, 2 + Math.floor(G.t * 6) % 2);
@@ -667,16 +683,29 @@ function draw(noHud) {
   // Endgegner (Boden oder Luft)
   if (G.bossOn) {
     const b = G.bossOn;
-    if (b.def.move === 'fly') shadow(b.x, b.y, b.def.w * 0.8, b.def.h * 0.5);
-    b.def.draw(b);
+    if (b.def.move === 'fly' && !ART[b.def.art]) shadow(b.x, b.y, b.def.w * 0.8, b.def.h * 0.5);
+    const pic = ART[b.def.art], fl = b.flash > 0 && Math.floor(G.t * 60) % 4 === 0;
+    if (pic) {
+      ctx.globalAlpha = b.def.move === 'fly' ? 0.3 : 0.35;
+      const off = b.def.move === 'fly' ? 14 : 4;
+      ctx.drawImage(ART[b.def.art + '_shadow'], Math.round(b.x - pic.width / 2 + off), Math.round(b.y - pic.height / 2 + off * 1.3));
+      ctx.globalAlpha = 1;
+      blit(pic, b.x, b.y, fl && ART[b.def.art + '_flash']);
+      if (b.def.move === 'fly') rotorBig(b.x, b.y - 4, 34);
+      b.def.guns.forEach(([dx, dy]) => { const a = aimA(b.x + dx, b.y + dy); for (let k = 0; k < 2; k++) drawLine(b.x + dx + k, b.y + dy, b.x + dx + k + Math.cos(a) * 9, b.y + dy + Math.sin(a) * 9, '#111'); });
+    } else b.def.draw(b);
   }
   // Items
   G.items.forEach(it => {
     const col = it.k === 'P' ? '#e8452c' : it.k === 'B' ? '#ffcc33' : '#4fc3ff';
     const x = Math.round(it.x), y = Math.round(it.y), blink = Math.floor(it.t * 6) % 2;
-    ctx.fillStyle = '#000'; ctx.fillRect(x - 6, y - 6, 12, 12);
-    ctx.fillStyle = blink ? '#fff' : col; ctx.fillRect(x - 5, y - 5, 10, 10);
-    text(it.k, x - 1, y - 2, blink ? col : '#fff');
+    const pic = ART[it.k === 'P' ? 'item_power' : it.k === 'B' ? 'item_bomb' : 'item_shield'];
+    if (pic) { ctx.drawImage(pic, x - 7, y - 7 + (blink ? -1 : 0)); text(it.k, x - 1, y - 2 + (blink ? -1 : 0), '#fff'); }
+    else {
+      ctx.fillStyle = '#000'; ctx.fillRect(x - 6, y - 6, 12, 12);
+      ctx.fillStyle = blink ? '#fff' : col; ctx.fillRect(x - 5, y - 5, 10, 10);
+      text(it.k, x - 1, y - 2, blink ? col : '#fff');
+    }
   });
   // Luftgegner mit Schatten
   G.foes.forEach(f => { if (!FOE[f.type].ground) shadow(f.x, f.y, 10, 6); });
@@ -738,6 +767,11 @@ function gun(x, y, len, a, flash) {
   drawLine(x + 1, y, x + 1 + Math.cos(a) * len, y + Math.sin(a) * len, '#111');
 }
 const aimA = (x, y) => Math.atan2(G.p.y - y, G.p.x - x);
+function rotorBig(x, y, r) {
+  const a = G.t * 30;
+  ctx.fillStyle = 'rgba(220,230,240,.10)'; ctx.beginPath(); ctx.arc(Math.round(x), Math.round(y), r, 0, Math.PI * 2); ctx.fill();
+  for (let k = 0; k < 3; k++) { const q = a + k * Math.PI * 2 / 3; drawLine(x, y, x + Math.cos(q) * r, y + Math.sin(q) * r, 'rgba(20,20,20,.45)'); }
+}
 function drawDestroyer(b) {
   const x = b.x, y = b.y, f = b.flash > 0 && Math.floor(G.t * 60) % 4 === 0;
   ctx.fillStyle = 'rgba(255,255,255,.35)'; ctx.fillRect(Math.round(x) - 18, Math.round(y) + 58, 36, 4);
