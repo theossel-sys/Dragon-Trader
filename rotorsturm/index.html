@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Rotorsturm">
+<meta name="theme-color" content="#0b0f14">
+<title>Rotorsturm</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+<style>
+  :root { --amber: #ffcc33; --red: #e8452c; --ink: #0b0f14; }
+  html, body { margin: 0; height: 100%; background: var(--ink); overflow: hidden; touch-action: none;
+    -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; overscroll-behavior: none; }
+  #wrap { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center;
+    padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left); }
+  canvas { display: block; image-rendering: pixelated; image-rendering: crisp-edges; box-shadow: 0 0 40px rgba(0,0,0,.6); }
+  .ov { position: fixed; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px;
+    font-family: 'Press Start 2P', monospace; color: #fff; text-align: center; padding: 24px; box-sizing: border-box; z-index: 5; }
+  .ov[hidden] { display: none; }
+  .ov.dim { background: rgba(5,8,12,.72); }
+  .logo { font-size: clamp(26px, 9vw, 54px); color: var(--amber); letter-spacing: 2px; line-height: 1.1;
+    text-shadow: 3px 3px 0 var(--red), 6px 6px 0 #000; transform: skewX(-6deg); }
+  .sub { font-size: 10px; color: #9fd3ff; line-height: 1.8; max-width: 320px; }
+  .blink { animation: blink 1s steps(2) infinite; font-size: 12px; color: #fff; }
+  @keyframes blink { 50% { opacity: 0; } }
+  .btn { font-family: inherit; font-size: 12px; color: var(--ink); background: var(--amber); border: 0; padding: 14px 18px;
+    box-shadow: 0 4px 0 #a07400; cursor: pointer; min-width: 200px; }
+  .btn.ghost { background: transparent; color: #fff; box-shadow: none; border: 2px solid #4a5a6a; }
+  .row { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+  .hi { font-size: 10px; color: var(--amber); }
+  .help { font-size: 9px; color: #b9c7d4; line-height: 2; max-width: 330px; }
+  .score { font-size: 18px; color: var(--amber); }
+  #bombBtn, #pauseBtn { position: fixed; z-index: 4; font-family: 'Press Start 2P', monospace; border: 0; display: none; }
+  #bombBtn { right: calc(env(safe-area-inset-right) + 16px); bottom: calc(env(safe-area-inset-bottom) + 22px);
+    width: 74px; height: 74px; border-radius: 50%; background: rgba(232,69,44,.82); color: #fff; font-size: 10px;
+    box-shadow: 0 0 0 3px rgba(255,255,255,.35), 0 4px 0 #7a1e10; }
+  #bombBtn:active { transform: translateY(2px); }
+  #pauseBtn { right: calc(env(safe-area-inset-right) + 10px); top: calc(env(safe-area-inset-top) + 10px);
+    width: 40px; height: 40px; background: rgba(0,0,0,.35); color: #fff; font-size: 12px; border: 2px solid rgba(255,255,255,.4); }
+</style>
+</head>
+<body>
+<div id="wrap"><canvas id="c" width="240" height="400"></canvas></div>
+<button id="bombBtn" aria-label="Bombe">BOMBE</button>
+<button id="pauseBtn" aria-label="Pause">II</button>
+
+<div id="title" class="ov dim">
+  <div class="logo">ROTOR<br>STURM</div>
+  <div class="sub">Vier Fronten. Ein Hubschrauber.<br>Halte durch bis zum Endgegner.</div>
+  <div class="hi" id="hiTitle"></div>
+  <button class="btn" id="start">START</button>
+  <div class="row"><button class="btn ghost" id="sound">TON: AN</button></div>
+  <div class="help">HANDY: Finger irgendwo ziehen = fliegen<br>Feuer automatisch · BOMBE = alles im Bild<br>PC: Pfeile/WASD · Leertaste = Bombe · P = Pause</div>
+</div>
+
+<div id="pause" class="ov dim" hidden>
+  <div class="logo" style="font-size:28px">PAUSE</div>
+  <button class="btn" id="resume">WEITER</button>
+  <button class="btn ghost" id="quit">AUFGEBEN</button>
+</div>
+
+<div id="over" class="ov dim" hidden>
+  <div class="logo" style="font-size:26px">SPIEL<br>VORBEI</div>
+  <div class="score" id="finalScore"></div>
+  <div class="hi" id="hiOver"></div>
+  <button class="btn" id="again">NOCHMAL</button>
+</div>
+
+<script src="game.js"></script>
+</body>
+</html>

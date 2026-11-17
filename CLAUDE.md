@@ -44,3 +44,9 @@ Sprache: immer auf Deutsch antworten.
   ui.js, style.css, index.html, tests/sim.js (KI-gegen-KI-Balancing), README mit Regeln.
   10 Hansestädte, 9 Waren, 3 Schiffstypen, Kontore, Lehen (Land/Volk/Getreide/Steuern), 6 Bauten, Fehde,
   8 Ränge Krämer→Reichsfürst. Zugreihenfolge rotiert (sonst gewinnt Spieler 1 immer). Im Emulator getestet.
+- 2026-11-17: Frage nach alten Spielen (Moon Patrol, Tiger-Heli) – Rechte NICHT ausgelaufen, ROMs nicht nutzbar.
+  User wollte Tiger-Heli-Look „nah am Original“; abgelehnt (kein Nachbau eines konkreten Spiels), stattdessen eigenes
+  Genre-Spiel **Rotorsturm** (vertikaler Heli-Shooter) gebaut: `rotorsturm/` (index.html + game.js, alles per Code:
+  Pixel-Sprites, Kachel-Gelände 8x8 prozedural, 3x5-Pixelschrift, 4 Zonen Küste/Wald/Industrie/Flugfeld mit Bossen
+  Zerstörer/Festungspanzer/Bunkerwerk/Sturmbrecher, Extras P/B/S, Web-Audio-Chiptune). Liegt vorerst auf dem Branch;
+  User fragen: eigenes Repo oder auf main (dann unter /Dragon-Trader/rotorsturm/ spielbar).
