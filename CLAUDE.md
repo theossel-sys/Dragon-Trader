@@ -48,8 +48,8 @@ Sprache: immer auf Deutsch antworten.
   User wollte Tiger-Heli-Look „nah am Original“; abgelehnt (kein Nachbau eines konkreten Spiels), stattdessen eigenes
   Genre-Spiel **Rotorsturm** (vertikaler Heli-Shooter) gebaut: `rotorsturm/` (index.html + game.js, alles per Code:
   Pixel-Sprites, Kachel-Gelände 8x8 prozedural, 3x5-Pixelschrift, 4 Zonen Küste/Wald/Industrie/Flugfeld mit Bossen
-  Zerstörer/Festungspanzer/Bunkerwerk/Sturmbrecher, Extras P/B/S, Web-Audio-Chiptune). Liegt vorerst auf dem Branch;
-  User fragen: eigenes Repo oder auf main (dann unter /Dragon-Trader/rotorsturm/ spielbar).
+  Zerstörer/Festungspanzer/Bunkerwerk/Sturmbrecher, Extras P/B/S, Web-Audio-Chiptune).
+  UMGEZOGEN ins eigene Repo https://github.com/theossel-sys/rotorsturm (main, eigene CLAUDE.md) – Arbeit nur noch dort.
   Draw-Things-Workflow für Rotorsturm: rotorsturm/art/PROMPTS.md (Pixel-Art-Prompts, Magenta-Hintergrund),
   Upload nach rotorsturm/art/incoming/, `python3 rotorsturm/tools/import_art.py` → rotorsturm/assets/.
   ERLEDIGT: 15 Bilder (lokale Session des Users mit Draw Things) eingebaut – Sprites, Bosse (Silhouetten-Schatten,
