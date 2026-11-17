@@ -107,8 +107,9 @@ def main():
             print(f'  da      {name}')
             continue
         img = Image.open(src)
-        if spec.get('keep_background'):
-            img = img.convert('RGBA')
+        already_cut = img.mode in ('RGBA', 'LA', 'P') and img.convert('RGBA').getpixel((0, 0))[3] == 0
+        if spec.get('keep_background') or already_cut:
+            img = img.convert('RGBA')        # schon freigestellt (z. B. aus der lokalen Session): nur zuschneiden
         else:
             img = remove_background(img, spec.get("tolerance", 90))
         out = fit(img, tuple(spec['size']), spec.get('mode', 'smooth'), spec.get('pad', 0))
