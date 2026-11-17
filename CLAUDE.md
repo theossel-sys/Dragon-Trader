@@ -51,4 +51,6 @@ Sprache: immer auf Deutsch antworten.
   Zerstörer/Festungspanzer/Bunkerwerk/Sturmbrecher, Extras P/B/S, Web-Audio-Chiptune). Liegt vorerst auf dem Branch;
   User fragen: eigenes Repo oder auf main (dann unter /Dragon-Trader/rotorsturm/ spielbar).
   Draw-Things-Workflow für Rotorsturm: rotorsturm/art/PROMPTS.md (Pixel-Art-Prompts, Magenta-Hintergrund),
-  Upload nach rotorsturm/art/incoming/, `python3 rotorsturm/tools/import_art.py` → rotorsturm/assets/. Einbau offen.
+  Upload nach rotorsturm/art/incoming/, `python3 rotorsturm/tools/import_art.py` → rotorsturm/assets/.
+  ERLEDIGT: 15 Bilder (lokale Session des Users mit Draw Things) eingebaut – Sprites, Bosse (Silhouetten-Schatten,
+  zielende Rohre darüber), Extras mit Buchstabe, Titelbild (JPEG). Code-Sprites bleiben Fallback.

@@ -113,7 +113,10 @@ def main():
         else:
             img = remove_background(img, spec.get("tolerance", 90))
         out = fit(img, tuple(spec['size']), spec.get('mode', 'smooth'), spec.get('pad', 0))
-        out.save(os.path.join(OUT, name + '.png'), optimize=True)
+        if spec.get('keep_background'):      # Fotos/Gemälde: als JPEG viel kleiner
+            out.convert('RGB').save(os.path.join(OUT, name + '.jpg'), quality=84, optimize=True, progressive=True)
+        else:
+            out.save(os.path.join(OUT, name + '.png'), optimize=True)
         done += 1
         print(f'  fertig  {name} -> assets/{name}.png {spec["size"][0]}x{spec["size"][1]}')
     print(f'{done} verarbeitet, {missing} fehlen')
